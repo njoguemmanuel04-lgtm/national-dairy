@@ -1,331 +1,44 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HOT DIGITS - LIVE M-PESA</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}body{background:#0a0a0a;color:#fff;padding:8px;padding-bottom:90px}
-#splash{position:fixed;inset:0;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity.5s}
-#splash.hide{opacity:0;pointer-events:none}
-.splash-card{background:#fff;border-radius:24px;padding:18px;width:92%;max-width:380px;text-align:center}
-.splash-card h1{color:#000;font-weight:900;font-size:36px;letter-spacing:-1px;font-family:Arial Black}
-.bigRow{display:flex;justify-content:center;gap:12px;margin:14px 0}
-.big{width:80px;height:80px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:44px}
-.big0{background:#e0f7ff;border:3px solid #00bfff;color:#000}
-.big1{background:#ffe0e0;border:3px solid #ff3b30;color:#000}
-.splash-caption{color:#000;text-align:left;margin-top:10px;font-size:14px;line-height:1.4}
-.top{background:#121212;border:1px solid #222;border-radius:12px;padding:10px;display:flex;justify-content:space-between}.bal{font-weight:700}.inp{width:70px;background:#1a1a1a;border:1px solid #333;color:#fff;border-radius:8px;padding:7px;text-align:center}.botsec{background:#121212;border-radius:18px;padding:10px;margin:12px 0}.bottitle{color:#00e6ff;font-weight:800;font-size:12px;margin-bottom:8px}.botcard{background:#1e1e1e;border-radius:12px;padding:10px;margin-bottom:8px;border:1px solid #2a2a2a}.tog{border:1px solid #333;background:#2a2a2a;color:#fff;padding:6px 14px;border-radius:20px;min-width:55px;cursor:pointer}.tog.on{background:#00e676;color:#000}.row{display:flex;gap:6px;margin-top:8px;align-items:center;flex-wrap:wrap}.sess{font-size:11px;color:#00e676;margin-top:6px;font-weight:700}.card{background:#112a24;border-radius:18px;padding:12px;margin:10px 0;border:1px solid #1a3a2f}.digits{display:flex;justify-content:space-between;gap:2px}.d{flex:1;text-align:center}.dc{width:38px;height:38px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-weight:700;margin:auto}.dc.active{background:#00e676;color:#000}.dp{font-size:9px;color:#888;margin-top:2px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.btn{padding:14px;border:none;border-radius:12px;font-weight:800;cursor:pointer}.be{background:#c8fff0;color:#003d2f}.bo{background:#fff0c8;color:#3d2f00}.bu{background:#d0d0ff;color:#00002f}.br{background:#ffd0d0;color:#3d0000}.results{background:#1a1a1a;border-radius:18px;padding:12px;margin-top:12px;border:1px solid #2a2a2a}.r-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.r-clear{background:#ff5a4f;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-weight:800;cursor:pointer}.r-item{display:flex;justify-content:space-between;padding:8px 10px;background:#111;border-radius:8px;margin-bottom:4px;border-left:3px solid}.r-item.win{border-color:#00e676}.r-item.loss{border-color:#ff4d4d}.depsec{background:#121212;border-radius:18px;padding:12px;display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}</style></head><body>
-
-<!-- MANDATORY LOGIN MODAL -->
-<div id="loginModal" style="position:fixed;inset:0;background:rgba(10,10,10,0.95);z-index:10000;display:flex;align-items:center;justify-content:center;">
-  <div class="splash-card" style="background:#121212;border:1px solid #333;color:#fff;width:90%;max-width:360px;">
-    <h1 style="color:#00e676;font-size:26px;margin-bottom:8px;">HOT DIGITS</h1>
-    <p style="font-size:13px;color:#aaa;margin-bottom:15px;">Enter your Safaricom M-Pesa number to continue</p>
-    <input id="loginPhoneInp" class="inp" style="width:100%;padding:12px;margin-bottom:14px;font-size:16px;" placeholder="07XXXXXXXX">
-    <button class="btn be" style="width:100%;padding:14px;background:#00e676;color:#000;font-size:16px;" onclick="handleLogin()">LOGIN / START</button>
-  </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>National Dairy | Kenya - Live</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--green:#087747;--green-dark:#064c32;--bg:#f6f9f6;--border:#e3ebe4}
+body{font-family:"DM Sans",sans-serif;background:var(--bg)}
+.container{width:min(1160px,92%);margin:auto}
+header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--green-dark)}
+.card{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.badge{padding:5px 10px;border-radius:100px;font-size:11px;font-weight:800;color:#fff}
+.badge-accepted{background:#15803d}.badge-a{background:#0e7490}.badge-b{background:#ca8a04}.badge-rejected{background:#dc2626}
+.category-btn{border:1px solid var(--border);background:#fff;border-radius:100px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer}
+.category-btn.active{background:var(--green);color:#fff}
+</style>
+</head>
+<body>
+<div style="background:#064c32;color:#fff;text-align:center;padding:8px;font-size:11px">🇰🇪 NATIONAL DAIRY Live — 23 Co-ops • M-Pesa • Live from Supabase • Kenya Dairy Board</div>
+<header><div class="container" style="min-height:70px;display:flex;align-items:center;justify-content:space-between"><a class="brand">🇰🇪 National Dairy Cooperative - Kenya</a><div style="font-size:12px;font-weight:700"><a href="admin.html" style="border:1px solid #ddd;border-radius:999px;padding:6px 10px;text-decoration:none">View Admin</a> QC Officer | Logout</div></div></header>
+<div class="container" style="padding:20px 0">
+<div class="card" style="padding:14px"><p style="font-size:13px;font-weight:700">Dairy Quality Monitoring — Updated: <span id="updTime"></span> • National Dairy Live</p>
+<div style="margin-top:12px;display:flex;gap:8px;overflow:auto" id="catBtns"><button class="category-btn active" data-cat="All">All Milk</button><button class="category-btn" data-cat="Accepted">Accepted</button><button class="category-btn" data-cat="Grade A">Grade A</button><button class="category-btn" data-cat="Grade B">Grade B</button><button class="category-btn" data-cat="Rejected">Rejected</button></div>
+<div style="display:grid;grid-template-columns:1.6fr .8fr;gap:16px;margin-top:16px"><div class="card"><div style="overflow:auto"><table style="width:100%;min-width:620px;border-collapse:collapse;font-size:13px"><thead><tr style="background:#e9ecea"><th style="padding:10px;text-align:left">Batch ID</th><th>Farmer Name</th><th>Volume (L)</th><th>Fat %</th><th>Quality</th><th>Remarks</th></tr></thead><tbody id="milkBody"><tr><td colspan="6" style="padding:20px;text-align:center">Loading live from National Dairy...</td></tr></tbody></table></div><div style="padding:10px;background:#f0f9f0;font-size:11px">Note: Kenya Dairy Board — Accepted, Grade A, Grade B, Rejected only.</div></div><div class="card" style="padding:16px"><h3>Quality Breakdown</h3><div id="breakdown" style="margin-top:12px;font-size:13px;line-height:2"></div></div></div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px"><div class="card" style="padding:14px;text-align:center"><small>Total Collections Today</small><b id="totalLit" style="display:block;font-size:22px">0 L</b><small style="color:green">Live from National Dairy</small></div><div class="card" style="padding:14px;text-align:center"><small>Accepted Milk</small><b id="acceptedLit" style="display:block;font-size:22px">0 L</b><small id="accPer">0%</small></div><div class="card" style="padding:14px;text-align:center"><small>Grade B Milk</small><b id="gradeBLit" style="display:block;font-size:22px">0 L</b><small id="bPer">0%</small></div><div class="card" style="padding:14px;text-align:center"><small>Rejected Milk</small><b id="rejectedLit" style="display:block;font-size:22px">0 L</b><small id="rejPer">0%</small></div></div>
 </div>
-
-<div id="splash"><div class="splash-card"><h1>HOT DIGITS</h1><div class="bigRow"><div class="big big0">0<br><span style="font-size:20px">❄️</span></div><div class="big big1">1<br><span style="font-size:20px">🔥</span></div></div><div class="splash-caption"><div>• <b>0 freezing ❄️</b> — ice, snowflakes</div><div style="margin-top:6px">• <b>1 on fire 🔥</b> — flames, hot</div><div style="margin-top:8px;color:#00e676;font-weight:800">• LIVE M-PESA Till 1803135 ✅</div></div></div></div>
-<div class="top"><div class="bal">💰 KES <span id="bal">0</span><div style="font-size:11px;color:#00e676;font-weight:bold" id="phoneDisp">No phone</div><div style="font-size:11px;color:#00e676" id="cloudStat">Cloud: CONNECTING...</div><div style="font-size:11px;color:#888" id="tradeInfo">Trades: 0/10</div></div><div style="display:flex;gap:6px;align-items:center"><input id="stakeInp" class="inp" value="5"></div></div>
-<div class="card"><div class="digits" id="digitBar"></div><canvas id="graph" height="60" style="width:100%;margin:10px 0;background:#0a1a15;border-radius:8px"></canvas><div class="grid"><button class="btn be" id="btnEven">EVEN +3</button><button class="btn bo" id="btnOdd">ODD +3</button><button class="btn bu" id="btnOver">OVER 1 +1</button><button class="btn br" id="btnUnder">UNDER 8 +1</button></div></div>
-<div class="botsec"><div class="bottitle">EVEN/ODD BOTS</div>
-<div class="botcard"><div style="display:flex;justify-content:space-between"><span>🛡️ Safe Base 5→+3</span><button class="tog" id="tog-safe" onclick="toggleBot('safe','even')">OFF</button></div><div class="row"><span>Base</span><input id="base-safe" class="inp" value="5"><span>TP</span><input id="tp-safe" class="inp" value="30"><span>SL</span><input id="sl-safe" class="inp" value="50"></div><div class="sess" id="sess-safe">Session: +0</div></div>
-<div class="botcard"><div style="display:flex;justify-content:space-between"><span>🔥 Agg Base 10→+6</span><button class="tog" id="tog-agg" onclick="toggleBot('agg','even')">OFF</button></div><div class="row"><span>Base</span><input id="base-agg" class="inp" value="10"><span>TP</span><input id="tp-agg" class="inp" value="60"><span>SL</span><input id="sl-agg" class="inp" value="100"></div><div class="sess" id="sess-agg">Session: +0</div></div></div>
-<div class="botsec"><div class="bottitle">OVER/UNDER BOTS</div>
-<div class="botcard"><div style="display:flex;justify-content:space-between"><span>🛡️ Safe OU Base 5→+1</span><button class="tog" id="tog-safeOU" onclick="toggleBot('safeOU','over')">OFF</button></div><div class="row"><span>Base</span><input id="base-safeOU" class="inp" value="5"><span>TP</span><input id="tp-safeOU" class="inp" value="30"><span>SL</span><input id="sl-safeOU" class="inp" value="50"></div><div class="sess" id="sess-safeOU">Session: +0</div></div>
-<div class="botcard"><div style="display:flex;justify-content:space-between"><span>🔥 Agg OU Base 10→+2</span><button class="tog" id="tog-aggOU" onclick="toggleBot('aggOU','over')">OFF</button></div><div class="row"><span>Base</span><input id="base-aggOU" class="inp" value="10"><span>TP</span><input id="tp-aggOU" class="inp" value="60"><span>SL</span><input id="sl-aggOU" class="inp" value="100"></div><div class="sess" id="sess-aggOU">Session: +0</div></div></div>
-
-<div class="botsec">
-  <div class="bottitle">CUSTOM ACCUMULATOR (MIN 10 KES)</div>
-  <div class="botcard">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <span>📈 Micro Accu Growth</span>
-      <button class="tog" id="tog-accu" onclick="toggleAccuGame()">OFF</button>
-    </div>
-    <div class="row">
-      <span>Stake</span><input id="accu-stake" class="inp" value="10">
-      <span>Growth</span>
-      <select id="accu-growth" class="inp" style="width:75px;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:6px;text-align:center">
-        <option value="0.01">1%</option>
-        <option value="0.03" selected>3%</option>
-        <option value="0.05">5%</option>
-      </select>
-    </div>
-    <div class="sess" id="accu-status" style="margin-top:8px;">Status: Ready | Payout: KES 10.00</div>
-  </div>
+<div class="card" style="max-width:760px;margin:24px auto;padding:16px"><h3>🇰🇪 Record Delivery - National Dairy</h3><form id="milkForm" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><input id="fName" required placeholder="Farmer Name" style="border:1px solid #ddd;border-radius:8px;padding:10px"><select id="fQuality" required style="border:1px solid #ddd;border-radius:8px;padding:10px"><option value="">Quality (No A+)</option><option>Accepted</option><option>Grade A</option><option>Grade B</option><option>Rejected</option></select><input id="fLit" type="number" required placeholder="Volume L" style="border:1px solid #ddd;border-radius:8px;padding:10px"><input id="fFat" placeholder="Fat % e.g 3.8" style="border:1px solid #ddd;border-radius:8px;padding:10px"><button style="grid-column:1/-1;background:#087747;color:#fff;padding:12px;border-radius:10px;font-weight:700;border:none">Save Delivery to National Dairy</button></form><p id="msg" style="font-size:12px;color:green;margin-top:6px"></p></div>
 </div>
-
-<div class="depsec"><input id="mpesaPhone" class="inp" style="flex:1;min-width:140px" placeholder="2547XXXXXXXX"><input id="depInp" class="inp" style="flex:1" placeholder="50-300"><button class="btn be" id="depBtn" onclick="doDeposit()">DEPOSIT LIVE</button><div id="depMsg" style="width:100%;font-size:11px;color:#00e676;margin-top:6px;text-align:center;line-height:1.4"></div></div>
-<div class="depsec"><input id="withInp" class="inp" style="flex:1" placeholder="Withdraw 100-500"><button class="btn br" onclick="doWithdraw()">WITHDRAW 10% fee</button></div>
-<div class="results"><div class="r-head"><span id="rTitle">RESULTS (0)</span><button class="r-clear" onclick="clearResults()">CLEAR</button></div><div id="resultsList"></div></div>
 <script>
-setTimeout(()=>{document.getElementById('splash').classList.add('hide'); setTimeout(()=>document.getElementById('splash').style.display='none',500)},2000);
-const SUPA_URL="https://hkhqbtyyqgvaktamilxs.supabase.co";const SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhraHFidHl5cWd2YWt0YW1pbHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMTQwNDQsImV4cCI6MjEwNjU5MDA0NH0.gJcUf9XgzF34sczhD79V9oOnPD7a3XEU-5BXoQHWuAg";const supa=window.supabase.createClient(SUPA_URL,SUPA_KEY);
-let BAL=parseInt(localStorage.getItem('bal')||'0'),TRADES=parseInt(localStorage.getItem('trades')||'0'),hist=[0,1,0,2,0,1,3,7,4,2,1,0,0,5,8,0,1],session={safe:0,agg:0,safeOU:0,aggOU:0},intervals={},flipState={safe:false,agg:false,safeOU:false,aggOU:false},results=JSON.parse(localStorage.getItem('results')||'[]');
-
-// MANDATORY LOGIN CHECK ON APP LOAD
-window.addEventListener('DOMContentLoaded', () => {
-    let savedPhone = localStorage.getItem('user_phone');
-    if (savedPhone) {
-        document.getElementById('loginModal').style.display = 'none';
-        document.getElementById('mpesaPhone').value = savedPhone;
-        document.getElementById('phoneDisp').innerText = savedPhone;
-        syncBal();
-        setupRealtimeSync(savedPhone);
-    }
-});
-
-async function handleLogin() {
-    let rawPhone = document.getElementById('loginPhoneInp').value.trim();
-    let phone = rawPhone.replace(/[^0-9]/g, '');
-    
-    if (phone.startsWith('0')) phone = '254' + phone.substring(1);
-    if (phone.startsWith('7') && phone.length === 9) phone = '254' + phone;
-
-    if (!phone.startsWith('254') || phone.length !== 12) {
-        alert('Please enter a valid Safaricom phone number (e.g., 0712345678)');
-        return;
-    }
-
-    localStorage.setItem('user_phone', phone);
-    document.getElementById('mpesaPhone').value = phone;
-    document.getElementById('phoneDisp').innerText = phone;
-    document.getElementById('loginModal').style.display = 'none';
-    
-    await syncBal();
-    setupRealtimeSync(phone);
-}
-
-// CONTROLLED DIGIT GENERATOR (HOUSE PROTECTION: EVEN/ODD WIN RATE SET TO 45%)
-function generateControlledDigit(tradeType, targetWinRate) {
-    let isWin = Math.random() < targetWinRate;
-    let evenDigits = [0, 2, 4, 6, 8];
-    let oddDigits = [1, 3, 5, 7, 9];
-    let over1Win = [2, 3, 4, 5, 6, 7, 8, 9];
-    let over1Loss = [0, 1];
-    let under8Win = [0, 1, 2, 3, 4, 5, 6, 7];
-    let under8Loss = [8, 9];
-
-    let digits = [];
-    if (tradeType === 'EVEN') digits = isWin ? evenDigits : oddDigits;
-    else if (tradeType === 'ODD') digits = isWin ? oddDigits : evenDigits;
-    else if (tradeType === 'OVER' || tradeType === 'OVER1') digits = isWin ? over1Win : over1Loss;
-    else if (tradeType === 'UNDER' || tradeType === 'UNDER8') digits = isWin ? under8Win : under8Loss;
-    else return Math.floor(Math.random() * 10);
-
-    return digits[Math.floor(Math.random() * digits.length)];
-}
-
-// PAYOUTS: EVEN/ODD = +3 profit on 5 stake; OVER/UNDER = +1 profit on 5 stake
-function calcPayout(s,isEven){
-  s=Math.max(1,parseInt(s)||5);
-  if(isEven){
-    return { profit: Math.floor(s * 0.6) }; // 3 profit for 5 stake
-  }else{
-    return { profit: Math.floor(s * 0.2) }; // 1 profit for 5 stake
-  }
-}
-
-function draw(){let bar=document.getElementById('digitBar');bar.innerHTML='';let counts=Array(10).fill(0);hist.forEach(d=>counts[d]++);let total=hist.length||1;for(let i=0;i<10;i++){let pct=Math.round(counts[i]/total*100);let div=document.createElement('div');div.className='d';div.innerHTML=`<div class="dc ${hist[hist.length-1]===i?'active':''}">${i}</div><div class="dp">${pct}%</div>`;bar.appendChild(div)}let c=document.getElementById('graph');let ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);ctx.strokeStyle='#00e676';ctx.lineWidth=2;ctx.beginPath();hist.forEach((v,i)=>{let x=i/hist.length*c.width;let y=c.height - v/9*c.height;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.stroke()}
-async function addResult(t,d,p,w,s){results.unshift({type:t,digit:d,profit:p,win:w,stake:s});if(results.length>100)results.pop();renderResults();localStorage.setItem('results',JSON.stringify(results));localStorage.setItem('bal',BAL);localStorage.setItem('trades',TRADES);let phone=document.getElementById('mpesaPhone').value||'guest';let house=w?-p:s;let payout=w?(s+p):0;try{await supa.from('bets').insert([{phone:phone,type:t,d:d,stake:s,payout:payout,house:house}]);}catch(e){}}
-function renderResults(){let l=document.getElementById('resultsList');l.innerHTML='';document.getElementById('rTitle').innerText=`RESULTS (${results.length})`;document.getElementById('bal').innerText=BAL;document.getElementById('tradeInfo').innerText=`Trades: ${TRADES}/10`;results.forEach(r=>{let div=document.createElement('div');div.className=`r-item ${r.win?'win':'loss'}`;div.innerHTML=`<span>${r.win?'✅':'❌'} ${r.type} D:${r.digit} S:${r.stake}</span><span>${r.win?'+'+r.profit:'-'+r.stake}</span>`;l.appendChild(div)})}
-function clearResults(){if(!confirm('Clear results?'))return;results=[];localStorage.removeItem('results');renderResults()}
-
-// BOT LOOP WITH CONTROLLED WIN RATES (Even/Odd = 45%, Over/Under = 85%)
-function toggleBot(n,t){let el=document.getElementById('tog-'+n);let off=el.innerText==='OFF';el.innerText=off?'ON':'OFF';el.className=off?'tog on':'tog';if(off){intervals[n]=setInterval(()=>{let b=parseInt(document.getElementById('base-'+n).value)||5;if(BAL<b){clearInterval(intervals[n]);el.innerText='OFF';el.className='tog';return;}let isEvenBot=t==='even';let tradeType=isEvenBot?(flipState[n]?'ODD':'EVEN'):(flipState[n]?'UNDER8':'OVER1');flipState[n]=!flipState[n];
-    
-    // House protection: Even/Odd set to 45% win rate, Over/Under set to 85% win rate
-    let targetWinRate = (tradeType === 'EVEN' || tradeType === 'ODD') ? 0.45 : 0.85;
-    let d = generateControlledDigit(tradeType, targetWinRate);
-    
-    let w=false;if(tradeType==='EVEN')w=d%2===0;if(tradeType==='ODD')w=d%2===1;if(tradeType==='OVER1')w=d>1;if(tradeType==='UNDER8')w=d<8;let p=calcPayout(b,isEvenBot).profit;if(w){BAL+=p;session[n]+=p;addResult(tradeType+' '+n,d,p,true,b)}else{BAL-=b;session[n]-=b;addResult(tradeType+' '+n,d,b,false,b)}TRADES++;document.getElementById('sess-'+n).innerText=`Session: ${session[n]>=0?'+':''}${session[n]} / TP +${document.getElementById('tp-'+n).value} / SL -${document.getElementById('sl-'+n).value}`;hist.push(d);if(hist.length>30)hist.shift();draw();renderResults();let tp=parseInt(document.getElementById('tp-'+n).value)||30,sl=parseInt(document.getElementById('sl-'+n).value)||50;if(session[n]>=tp||session[n]<=-sl){clearInterval(intervals[n]);el.innerText='OFF';el.className='tog';}},1000)}else clearInterval(intervals[n])}
-
-// ACCUMULATOR BOT LOGIC
-let accuInterval = null;
-let accuState = {
-    running: false,
-    stake: 10,
-    growthRate: 0.03,
-    currentPayout: 10,
-    entryPrice: 0,
-    upperBarrier: 0,
-    lowerBarrier: 0,
-    barrierRange: 1.2,
-    currentPrice: 100.0,
-    ticksSurvived: 0
-};
-
-function toggleAccuGame() {
-    let el = document.getElementById('tog-accu');
-    let isOff = el.innerText === 'OFF';
-
-    if (isOff) {
-        let stake = parseFloat(document.getElementById('accu-stake').value) || 10;
-        if (stake < 10) return alert('Minimum accumulator stake is 10 KES');
-        if (BAL < stake) return alert('Insufficient balance for this stake');
-
-        BAL -= stake;
-        TRADES++;
-        
-        accuState.running = true;
-        accuState.stake = stake;
-        accuState.currentPayout = stake;
-        accuState.growthRate = parseFloat(document.getElementById('accu-growth').value);
-        accuState.entryPrice = accuState.currentPrice;
-        accuState.upperBarrier = accuState.entryPrice + accuState.barrierRange;
-        accuState.lowerBarrier = accuState.entryPrice - accuState.barrierRange;
-        accuState.ticksSurvived = 0;
-
-        el.innerText = 'CASH OUT';
-        el.className = 'tog on';
-        renderResults();
-
-        accuInterval = setInterval(() => {
-            if (!accuState.running) return;
-
-            let movement = (Math.random() - 0.48) * 1.4;
-            accuState.currentPrice += movement;
-
-            if (accuState.currentPrice >= accuState.upperBarrier || accuState.currentPrice <= accuState.lowerBarrier) {
-                accuState.running = false;
-                clearInterval(accuInterval);
-                el.innerText = 'OFF';
-                el.className = 'tog';
-                document.getElementById('accu-status').innerHTML = `❌ Barrier Breached! Lost KES ${accuState.stake}`;
-                document.getElementById('accu-status').style.color = '#ff4d4d';
-                addResult('ACCU', Math.floor(accuState.currentPrice % 10), accuState.stake, false, accuState.stake);
-                renderResults();
-                return;
-            }
-
-            accuState.ticksSurvived++;
-            accuState.currentPayout = accuState.currentPayout * (1 + accuState.growthRate);
-            
-            document.getElementById('accu-status').innerHTML = `🟢 Ticks: ${accuState.ticksSurvived} | Payout: KES ${accuState.currentPayout.toFixed(2)}`;
-            document.getElementById('accu-status').style.color = '#00e676';
-
-        }, 1000);
-
-    } else {
-        if (!accuState.running) return;
-        accuState.running = false;
-        clearInterval(accuInterval);
-
-        let profit = accuState.currentPayout - accuState.stake;
-        BAL += accuState.currentPayout;
-
-        el.innerText = 'OFF';
-        el.className = 'tog';
-        document.getElementById('accu-status').innerHTML = `✅ Cashed Out! Won KES ${profit.toFixed(2)}`;
-        document.getElementById('accu-status').style.color = '#00e676';
-
-        addResult('ACCU CASH', accuState.ticksSurvived, Math.floor(profit), true, accuState.stake);
-        renderResults();
-    }
-}
-
-draw();renderResults();
-
-// MANUAL BUTTONS (Even/Odd = 45% win rate, Over/Under = 50% win rate)
-['Even','Odd','Over','Under'].forEach(t=>{document.getElementById('btn'+t).onclick=()=>{let s=parseInt(document.getElementById('stakeInp').value)||5;let tName=t.toUpperCase();let winRate=(tName==='EVEN'||tName==='ODD')?0.45:0.50;let d=generateControlledDigit(tName, winRate);let e=t==='Even'||t==='Odd';let w=false;if(t==='Even')w=d%2===0;if(t==='Odd')w=d%2===1;if(t==='Over')w=d>1;if(t==='Under')w=d<8;let p=calcPayout(s,e).profit;if(w){BAL+=p;addResult(tName,d,p,true,s)}else{BAL-=s;addResult(tName,d,s,false,s)}TRADES++;renderResults();hist.push(d);if(hist.length>30)hist.shift();draw();}});
-
-// Cloud balance sync
-async function syncBal(){
-  let phone=document.getElementById('mpesaPhone').value.trim();
-  if(!phone) return;
-  let p=phone.replace(/[^0-9]/g,''); if(p.startsWith('0')) p='254'+p.substring(1);
-  document.getElementById('phoneDisp').innerText=p;
-  try{
-    let {data}=await supa.from('user_balances').select('balance').eq('phone',p).maybeSingle();
-    if(data){BAL=data.balance; renderResults(); localStorage.setItem('bal',BAL);}
-    document.getElementById('cloudStat').innerText='Cloud: LIVE | Till 1803135';
-  }catch(e){document.getElementById('cloudStat').innerText='Cloud: LIVE';}
-}
-
-// REALTIME AUTO-CREDITING LISTENER
-function setupRealtimeSync(phone) {
-    if (!phone) return;
-    supa.channel('public:user_balances')
-        .on('postgres_changes', { 
-            event: '*', 
-            schema: 'public', 
-            table: 'user_balances',
-            filter: `phone=eq.${phone}`
-        }, payload => {
-            if (payload.new && payload.new.balance !== undefined) {
-                BAL = payload.new.balance;
-                localStorage.setItem('bal', BAL);
-                renderResults();
-                let msg = document.getElementById('depMsg');
-                if(msg) {
-                  msg.style.color = '#00e676';
-                  msg.innerHTML = `✅ Deposit Received! New Balance: KES ${BAL}`;
-                }
-            }
-        })
-        .subscribe();
-}
-
-document.getElementById('mpesaPhone').addEventListener('change',syncBal);
-supa.from('bets').select('id').limit(1).then(r=>{document.getElementById('cloudStat').innerText=r.error?'Cloud: ERROR':'Cloud: LIVE | Till 1803135';});
-async function doDeposit(){
-  let a=parseInt(document.getElementById('depInp').value)||0;
-  let phoneRaw=document.getElementById('mpesaPhone').value.trim();
-  let phone=phoneRaw.replace(/[^0-9]/g,'');
-  let msg=document.getElementById('depMsg'); let btn=document.getElementById('depBtn');
-  if(phone.startsWith('0')) phone='254'+phone.substring(1);
-  if(phone.startsWith('7') && phone.length==9) phone='254'+phone;
-  if(a<20) return alert('Min 20 KES');
-  if(phone==='254116982197') return alert('Cannot use Till owner number! Use customer like 2547XXXX');
-  if(!phone.startsWith('254') || phone.length!=12) return alert('Phone 2547XXXXXXXX');
-  btn.textContent='SENDING STK...'; btn.disabled=true; msg.style.color='#00e676';
-  msg.textContent='Connecting to Till 1803135...'; await syncBal();
-  try{
-    const res=await fetch('/api/mpesa/stk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,amount:a})});
-    const text=await res.text(); let data; try{data=JSON.parse(text)}catch{data={error:text}}
-    console.log('STK',data);
-    if(data.ResponseCode=='0' && data.CheckoutRequestID){
-      msg.innerHTML='✅ STK sent to '+phone+'<br>Pay TILL 1803135 KES'+a+' - Enter PIN';
-      btn.textContent='WAITING FOR PIN...'; let tries=0;
-      let poll=setInterval(async()=>{
-        tries++;
-        try{
-          let check=await fetch('/api/mpesa/check?CheckoutRequestID='+data.CheckoutRequestID);
-          let j=await check.json();
-          if(j.paid){
-            clearInterval(poll); BAL+=j.amount; TRADES=0; renderResults(); localStorage.setItem('bal',BAL);
-            msg.innerHTML='✅ PAID! Code: '+j.code+' | +KES '+j.amount+' | Bal: '+BAL;
-            btn.textContent='DEPOSIT LIVE'; btn.disabled=false;
-          }
-        }catch(e){}
-        if(tries>40){clearInterval(poll); msg.innerHTML='⏰ If you entered PIN, refresh in 1 min. Check Supabase deposits table.'; btn.disabled=false; btn.textContent='DEPOSIT LIVE';}
-      },3000);
-    }else{
-      msg.innerHTML='❌ '+(data.errorMessage||data.error||JSON.stringify(data).slice(0,200)); msg.style.color='#ff5a4f'; btn.textContent='DEPOSIT LIVE'; btn.disabled=false;
-    }
-  }catch(e){msg.textContent='Network error: '+e.message; msg.style.color='#ff5a4f'; btn.disabled=false; btn.textContent='DEPOSIT LIVE';}
-}
-
-async function doWithdraw(){
-  if(TRADES < 10) return alert('Need 10 trades');
-  let a = parseInt(document.getElementById('withInp').value) || 0;
-  if(a < 100 || a > 500) return alert('Min 100 Max 500');
-  if(BAL < a) return alert('Low balance');
-  let f = Math.floor(a * 0.1);
-  let phone = document.getElementById('mpesaPhone').value.trim() || 'guest';
-  
-  try{
-    let { error } = await supa.from('withdrawals').insert([{
-      phone: phone,
-      amount: a,
-      receive: a - f,
-      status: 'pending'
-    }]);
-
-    if(error){
-      alert('Withdrawal Error: ' + error.message);
-    } else {
-      BAL -= a;
-      renderResults();
-      alert(`Withdrawal submitted! You get ${a - f} (10% fee)`);
-    }
-  } catch(e){
-    alert('Network error: ' + e.message);
-  }
-}
-</script></body></html>
+let supa; document.getElementById("updTime").innerText=new Date().toLocaleString('en-KE',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+let allData=[];
+function badge(q){ q=(q||'').toLowerCase(); if(q.includes('accept')) return `<span class="badge badge-accepted">Accepted</span>`; if(q.includes('grade a')) return `<span class="badge badge-a">Grade A</span>`; if(q.includes('grade b')) return `<span class="badge badge-b">Grade B</span>`; return `<span class="badge badge-rejected">Rejected</span>`; }
+function render(filter="All"){ const filtered=filter==="All"?allData:allData.filter(d=>d.quality===filter); document.getElementById("milkBody").innerHTML=filtered.length?filtered.map(d=>`<tr><td style="padding:10px">${d.id}</td><td>${d.farmer}</td><td>${d.vol}L</td><td>${d.fat}%</td><td>${badge(d.quality)}</td><td style="font-size:11px">${d.remark}</td></tr>`).join(''):`<tr><td colspan=6 style="padding:20px;text-align:center">No deliveries yet — save one below</td></tr>`; let acc=0,b=0,rej=0,a=0,total=0; allData.forEach(d=>{total+=Number(d.vol); const q=(d.quality||'').toLowerCase(); if(q.includes('accept')) acc+=Number(d.vol); else if(q.includes('grade a')) a+=Number(d.vol); else if(q.includes('grade b')) b+=Number(d.vol); else rej+=Number(d.vol);}); document.getElementById("totalLit").innerText=total+" L"; document.getElementById("acceptedLit").innerText=acc+" L"; document.getElementById("gradeBLit").innerText=b+" L"; document.getElementById("rejectedLit").innerText=rej+" L"; document.getElementById("breakdown").innerHTML=`Accepted ${acc}L (${total?Math.round(acc/total*100):0}%)<br>Grade A ${a}L (${total?Math.round(a/total*100):0}%)<br>Grade B ${b}L (${total?Math.round(b/total*100):0}%)<br>Rejected ${rej}L (${total?Math.round(rej/total*100):0}%)`; }
+async function loadFromSupabase(){ try{ const {data,error}=await supa.from('deliveries').select('*').order('created_at',{ascending:false}).limit(200); if(error) throw error; if(data && data.length>0){ allData=data.map(r=>({ id:r.batch_id||r.id.slice(0,8), farmer:r.farmer_name||r.farmer||'Unknown', vol:Number(r.volume??r.litres??0), fat:r.fat_percent??r.fat??'3.5', quality:r.quality||'Accepted', remark:r.quality?.toLowerCase().includes('reject')?'High bacteria — rejected':r.quality?.toLowerCase().includes('grade b')?'Below target — monitor':'Meets standard — cleared' })); } else { allData=[]; } render(document.querySelector(".category-btn.active")?.dataset.cat||"All"); }catch(e){ document.getElementById("milkBody").innerHTML=`<tr><td colspan=6 style="padding:12px;color:red">Error: ${e.message}</td></tr>`; } }
+document.getElementById("catBtns").addEventListener("click",e=>{const b=e.target.closest("[data-cat]"); if(!b) return; document.querySelectorAll(".category-btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); render(b.dataset.cat)});
+document.getElementById("milkForm").addEventListener("submit",async e=>{ e.preventDefault(); const farmer=document.getElementById("fName").value.trim(); const quality=document.getElementById("fQuality").value; const vol=Number(document.getElementById("fLit").value); const fat=document.getElementById("fFat").value||"3.5"; const batch="ND-"+Date.now().toString().slice(-5); document.getElementById("msg").innerText="Saving to National Dairy..."; const {error}=await supa.from('deliveries').insert([{ batch_id:batch, farmer_name:farmer, volume:vol, fat_percent:Number(fat), fat:Number(fat), quality:quality }]); if(error){ document.getElementById("msg").innerText="Error: "+error.message; return; } allData.unshift({id:batch,farmer,vol,fat,quality,remark:quality.toLowerCase().includes('reject')?'High bacteria — rejected':'Meets standard — cleared'}); render(document.querySelector(".category-btn.active").dataset.cat); document.getElementById("msg").innerText=`Saved ${vol}L ${farmer} — ${quality} (National Dairy Live)`; e.target.reset(); });
+async function init(){ let cfg; try{ let res=await fetch('/api/config'); cfg=await res.json(); if(!cfg.url || !cfg.anonKey) throw 0; }catch{ cfg={url:"https://hkhqbtyyqgvaktamilxs.supabase.co",anonKey:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhraHFidHl5cWd2YWt0YW1pbHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMTQwNDQsImV4cCI6MjEwNjU5MDA0NH0.gJcUf9XgzF34sczhD79V9oOnPD7a3XEU-5BXoQHWuAg"}; } supa=supabase.createClient(cfg.url,cfg.anonKey); loadFromSupabase(); supa.channel('national-dairy-live').on('postgres_changes',{event:'*',schema:'public',table:'deliveries'},()=>loadFromSupabase()).subscribe(); } init();
+</script>
+</body>
+</html>
