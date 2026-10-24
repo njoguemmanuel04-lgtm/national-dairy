@@ -1,114 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>National Dairy Cooperative - Kenya | Clerk</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
-<style>body{font-family:'DM Sans',sans-serif;background:#f5f8f5}</style>
+<style>body{font-family:DM Sans,sans-serif;background:#f5f8f5}</style>
 </head>
 <body>
-
-<!-- Top Banner -->
-<div class="bg-[#0a4d2e] text-white text-center text-[11px] py-1.5 px-2">
-🇰🇪 NATIONAL DAIRY Live — 23 Co-ops • M-Pesa • Live from Supabase • Kenya Dairy Board
-</div>
-
-<!-- Header - NO ADMIN BUTTON -->
+<div class="bg-[#0a4d2e] text-white text-center text-[11px] py-1.5">🇰🇪 NATIONAL DAIRY Live — 23 Co-ops • M-Pesa • Live from Supabase • Kenya Dairy Board</div>
 <header class="bg-white border-b flex justify-between items-center px-4 py-3">
   <div class="font-bold text-[14px]">🇰🇪 National Dairy Cooperative - Kenya</div>
-  <div class="text-[12px] font-bold">QC Officer | <span onclick="location.reload()" class="cursor-pointer hover:underline">Logout</span></div>
+  <div class="text-[12px] font-bold">QC Officer | <span onclick="location.reload()" class="cursor-pointer">Logout</span></div>
 </header>
 
 <div class="max-w-[1150px] w-[92%] mx-auto py-4">
-
-  <!-- Add Delivery (Clerk Function) -->
   <div class="bg-white rounded-2xl border p-4 mb-4">
     <h3 class="font-bold text-[13px] mb-2">Add Delivery - Clerk</h3>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
       <input id="farmer" placeholder="Farmer Name" class="border rounded-xl p-2.5 text-[12px]">
       <input id="volume" type="number" placeholder="Volume (L)" class="border rounded-xl p-2.5 text-[12px]">
       <input id="fat" type="number" step="0.1" placeholder="Fat % 3.8" class="border rounded-xl p-2.5 text-[12px]">
-      <select id="quality" class="border rounded-xl p-2.5 text-[12px]">
-        <option>Accepted</option><option>Grade A</option><option>Grade B</option><option>Rejected</option>
-      </select>
+      <select id="quality" class="border rounded-xl p-2.5 text-[12px]"><option>Accepted</option><option>Grade A</option><option>Grade B</option><option>Rejected</option></select>
     </div>
     <button onclick="saveDelivery()" class="w-full bg-[#0a7a42] text-white rounded-xl py-2.5 mt-3 text-[12px] font-bold">Save to National Dairy Live</button>
     <p id="msg" class="text-[11px] text-green-700 mt-2"></p>
   </div>
 
-  <!-- Quality Monitoring -->
   <div class="bg-white rounded-2xl border p-4">
-    <h2 class="font-bold text-[14px] mb-3">Dairy Quality Monitoring — Updated: <span id="updated">24 Oct 2026, 11:25</span> • National Dairy Live</h2>
+    <h2 class="font-bold text-[14px] mb-3">Dairy Quality Monitoring — Updated: <span id="updated">24 Oct 2026, 11:57</span> • National Dairy Live</h2>
     
-    <div class="flex gap-2 overflow-x-auto pb-2 mb-3 border-b">
-      <button class="bg-[#0a7a42] text-white rounded-full px-5 py-2 text-[12px] font-bold whitespace-nowrap">All Milk</button>
-      <button class="border rounded-full px-5 py-2 text-[12px] whitespace-nowrap">Accepted</button>
-      <button class="border rounded-full px-5 py-2 text-[12px] whitespace-nowrap">Grade A</button>
-      <button class="border rounded-full px-5 py-2 text-[12px] whitespace-nowrap">Grade B</button>
-      <button class="border rounded-full px-5 py-2 text-[12px] whitespace-nowrap">Rejected</button>
+    <!-- WORKING FILTERS -->
+    <div class="flex gap-2 overflow-x-auto pb-2 mb-3 border-b" id="filterBar">
+      <button data-filter="All Milk" onclick="applyFilter('All Milk')" class="filter-btn bg-[#0a7a42] text-white rounded-full px-5 py-2 text-[12px] font-bold whitespace-nowrap">All Milk</button>
+      <button data-filter="Accepted" onclick="applyFilter('Accepted')" class="filter-btn border rounded-full px-5 py-2 text-[12px] whitespace-nowrap bg-white">Accepted</button>
+      <button data-filter="Grade A" onclick="applyFilter('Grade A')" class="filter-btn border rounded-full px-5 py-2 text-[12px] whitespace-nowrap bg-white">Grade A</button>
+      <button data-filter="Grade B" onclick="applyFilter('Grade B')" class="filter-btn border rounded-full px-5 py-2 text-[12px] whitespace-nowrap bg-white">Grade B</button>
+      <button data-filter="Rejected" onclick="applyFilter('Rejected')" class="filter-btn border rounded-full px-5 py-2 text-[12px] whitespace-nowrap bg-white">Rejected</button>
     </div>
 
-    <div class="grid md:grid-cols-[1.8fr_1fr] gap-4">
-      <div class="overflow-auto border rounded-xl">
-        <table class="w-full text-[12px] min-w-[500px]">
-          <thead class="bg-[#eef2ee]"><tr><th class="text-left p-2.5">Batch ID</th><th class="text-left">Farmer Name</th><th class="text-left">Vol</th><th class="text-left">Quality</th></tr></thead>
-          <tbody id="clerkBody"><tr><td colspan="4" class="p-6 text-center">Loading National Dairy Live...</td></tr></tbody>
-        </table>
-        <div class="p-2.5 bg-[#f0f7f0] text-[11px] mt-0">Note: Kenya Dairy Board — Accepted, Grade A, Grade B, Rejected only.</div>
-      </div>
-
-      <div class="border rounded-xl p-4">
-        <h3 class="font-bold text-[15px]">Quality Breakdown</h3>
-        <div id="breakdown" class="mt-3 text-[13px] leading-7">
-          Accepted 0L (0%)<br>Grade A 20L (100%)<br>Grade B 0L (0%)<br>Rejected 0L (0%)
-        </div>
-      </div>
+    <div class="overflow-auto border rounded-xl">
+      <table class="w-full text-[12px] min-w-[500px]"><thead class="bg-[#eef2ee]"><tr><th class="text-left p-2.5">Batch ID</th><th class="text-left">Farmer Name</th><th class="text-left">Vol</th><th class="text-left">Quality</th></tr></thead>
+      <tbody id="clerkBody"><tr><td colspan="4" class="p-6 text-center">Loading...</td></tr></tbody></table>
+      <div class="p-2.5 bg-[#f0f7f0] text-[11px]">Note: Kenya Dairy Board — Accepted, Grade A, Grade B, Rejected only.</div>
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
-      <div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Total Collections Today</div><b id="cTotal" class="text-[22px] block my-1">20 L</b><div class="text-[12px] text-green-600">Live from National Dairy</div></div>
-      <div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Accepted Milk</div><b id="cAcc" class="text-[20px] block">0 L</b><div class="text-[11px]">0%</div></div>
-      <div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Grade B Milk</div><b id="cB" class="text-[20px] block">0 L</b><div class="text-[11px]">0%</div></div>
-      <div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Rejected Milk</div><b id="cRej" class="text-[20px] block">0 L</b><div class="text-[11px]">0%</div></div>
+      <div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Total Collections Today</div><b id="cTotal" class="text-[22px] block">0 L</b></div>
+      <div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Accepted Milk</div><b id="cAcc" class="text-[20px] block">0 L</b></div>
+      <div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Grade B Milk</div><b id="cB" class="text-[20px] block">0 L</b></div>
+      <div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Rejected Milk</div><b id="cRej" class="text-[20px] block">0 L</b></div>
     </div>
+    <div class="border rounded-xl p-4 mt-3"><h3 class="font-bold text-[15px]">Quality Breakdown</h3><div id="breakdown" class="mt-2 text-[13px]"></div></div>
   </div>
 </div>
 
 <script>
-let supa;
+let supa, allDeliveries=[], activeFilter='All Milk';
+function applyFilter(f){
+  activeFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(btn=>{
+    if(btn.dataset.filter===f) btn.className='filter-btn bg-[#0a7a42] text-white rounded-full px-5 py-2 text-[12px] font-bold whitespace-nowrap';
+    else btn.className='filter-btn border rounded-full px-5 py-2 text-[12px] whitespace-nowrap bg-white';
+  });
+  renderTable();
+}
+function renderTable(){
+  let data=allDeliveries;
+  if(activeFilter!=='All Milk') data=allDeliveries.filter(r=>(r.quality||'').toLowerCase().includes(activeFilter.toLowerCase()));
+  const body=document.getElementById('clerkBody');
+  if(data.length===0) body.innerHTML=`<tr><td colspan="4" class="p-6 text-center text-gray-500">No ${activeFilter} milk found</td></tr>`;
+  else body.innerHTML=data.map(r=>`<tr class="border-t"><td class="p-2.5">${r.batch_id}</td><td>${r.farmer_name}</td><td>${r.volume||r.litres}L</td><td>${r.quality}</td></tr>`).join('');
+}
 async function saveDelivery(){
-  const farmer=document.getElementById('farmer').value.trim();
-  const vol=Number(document.getElementById('volume').value);
-  const fat=Number(document.getElementById('fat').value)||3.8;
-  const quality=document.getElementById('quality').value;
-  if(!farmer||!vol) return alert('Enter farmer and volume');
-  const batch='ND-'+Math.floor(10000+Math.random()*89999);
+  const farmer=document.getElementById('farmer').value.trim(); const vol=Number(document.getElementById('volume').value); const fat=Number(document.getElementById('fat').value)||3.8; const quality=document.getElementById('quality').value;
+  if(!farmer||!vol) return alert('Enter farmer and volume'); const batch='ND-'+Math.floor(10000+Math.random()*89999);
   const {error}=await supa.from('deliveries').insert([{batch_id:batch, farmer_name:farmer, volume:vol, litres:vol, fat_percent:fat, fat:fat, quality:quality}]);
-  if(error){ document.getElementById('msg').innerText='Error: '+error.message; } 
-  else { document.getElementById('msg').innerText='Saved '+batch; document.getElementById('farmer').value=''; document.getElementById('volume').value=''; loadClerk(); }
+  if(error) document.getElementById('msg').innerText=error.message; else {document.getElementById('msg').innerText='Saved '+batch; loadClerk();}
 }
 async function loadClerk(){
-  try{
-    const {data}=await supa.from('deliveries').select('*').order('created_at',{ascending:false}).limit(100);
-    if(!data) return;
-    let total=0, acc=0, ga=0, gb=0, rej=0;
-    data.forEach(r=>{ const v=Number(r.volume||r.litres||0); total+=v; const q=(r.quality||'').toLowerCase(); if(q.includes('accepted')) acc+=v; else if(q.includes('grade a')) ga+=v; else if(q.includes('grade b')) gb+=v; else if(q.includes('reject')) rej+=v; });
-    document.getElementById('clerkBody').innerHTML=data.map(r=>`<tr class="border-t"><td class="p-2.5">${r.batch_id||'ND-'}</td><td>${r.farmer_name}</td><td>${r.volume||r.litres}L</td><td>${r.quality}</td></tr>`).join('');
-    document.getElementById('cTotal').innerText=total+' L';
-    document.getElementById('cAcc').innerText=acc+' L';
-    document.getElementById('cB').innerText=gb+' L';
-    document.getElementById('cRej').innerText=rej+' L';
-    document.getElementById('breakdown').innerHTML=`Accepted ${acc}L (${total?Math.round(acc/total*100):0}%)<br>Grade A ${ga}L (${total?Math.round(ga/total*100):0}%)<br>Grade B ${gb}L (${total?Math.round(gb/total*100):0}%)<br>Rejected ${rej}L (${total?Math.round(rej/total*100):0}%)`;
-    document.getElementById('updated').innerText=new Date().toLocaleString('en-KE',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  }catch(e){}
+  const {data}=await supa.from('deliveries').select('*').order('created_at',{ascending:false}).limit(200);
+  allDeliveries=data||[]; let total=0, acc=0, ga=0, gb=0, rej=0;
+  allDeliveries.forEach(r=>{const v=Number(r.volume||r.litres||0); total+=v; const q=(r.quality||'').toLowerCase(); if(q.includes('accepted')) acc+=v; else if(q.includes('grade a')) ga+=v; else if(q.includes('grade b')) gb+=v; else if(q.includes('reject')) rej+=v;});
+  document.getElementById('cTotal').innerText=total+' L'; document.getElementById('cAcc').innerText=acc+' L'; document.getElementById('cB').innerText=gb+' L'; document.getElementById('cRej').innerText=rej+' L';
+  document.getElementById('breakdown').innerHTML=`Accepted ${acc}L (${total?Math.round(acc/total*100):0}%)<br>Grade A ${ga}L (${total?Math.round(ga/total*100):0}%)<br>Grade B ${gb}L<br>Rejected ${rej}L`;
+  document.getElementById('updated').innerText=new Date().toLocaleString('en-KE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+  renderTable();
 }
-async function init(){
-  let cfg; try{ const r=await fetch('/api/config'); cfg=await r.json(); if(!cfg.url) throw 0; }catch{ cfg={url:"https://hkhqbtyyqgvaktamilxs.supabase.co", anonKey:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhraHFidHl5cWd2YWt0YW1pbHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMTQwNDQsImV4cCI6MjEwNjU5MDA0NH0.gJcUf9XgzF34sczhD79V9oOnPD7a3XEU-5BXoQHWuAg"}; }
-  supa=supabase.createClient(cfg.url,cfg.anonKey); loadClerk();
-}
+async function init(){ let cfg; try{ const r=await fetch('/api/config'); cfg=await r.json(); }catch{ cfg={url:"https://hkhqbtyyqgvaktamilxs.supabase.co", anonKey:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhraHFidHl5cWd2YWt0YW1pbHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMTQwNDQsImV4cCI6MjEwNjU5MDA0NH0.gJcUf9XgzF34sczhD79V9oOnPD7a3XEU-5BXoQHWuAg"}; } supa=supabase.createClient(cfg.url,cfg.anonKey); loadClerk(); }
 init();
 </script>
 </body>
