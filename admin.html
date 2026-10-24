@@ -1,87 +1,67 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HOUSE ANALYTICS - MARK X</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}body{background:#06140f;color:#fff;padding:10px;padding-bottom:40px}.card{background:#1a1a1a;border-radius:18px;padding:14px;margin-bottom:12px;border:1px solid #222}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}.green{color:#00e676}.red{color:#ff5a5a}.yellow{color:#ffca28}.cyan{color:#00e6ff}.progress{height:14px;background:#222;border-radius:10px;overflow:hidden;margin:8px 0}.bar{height:100%;background:linear-gradient(90deg,#00e676,#00e6ff);width:0%}table{width:100%;font-size:12px;border-collapse:collapse}th{color:#777;text-align:left;padding:8px 4px;font-size:10px;text-transform:uppercase}td{padding:9px 4px;border-top:1px solid #222}button{border:none;border-radius:12px;padding:10px 18px;font-weight:800;cursor:pointer}.refresh{background:#00e676;color:#000}.csv{background:#ff7a7a;color:#fff;margin-left:6px}.hrow{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}input{background:#222;border:1px solid #333;color:#fff;padding:8px 12px;border-radius:10px}</style></head><body>
-<div class="card"><div class="hrow"><div><h2>🏦 HOUSE ANALYTICS - MARK X</h2><div style="font-size:11px;color:#00e676;margin-top:4px" id="cloudStatus">Cloud CONNECTING...</div></div><div style="display:flex"><button class="refresh" onclick="loadAll()">🔄 REFRESH</button><button class="csv" onclick="exportCSV()">CSV</button></div></div>
-<div class="grid4" style="margin-top:12px"><div><div style="font-size:10px;color:#888">TOTAL USERS</div><div style="font-size:22px;font-weight:900" class="cyan" id="totalUsers">0</div></div><div><div style="font-size:10px;color:#888">ACTIVE TODAY</div><div style="font-size:22px;font-weight:900" class="green" id="activeToday">0</div></div><div><div style="font-size:10px;color:#888">WITH BAL >0</div><div style="font-size:22px;font-weight:900" class="yellow" id="usersWithBal">0</div></div><div><div style="font-size:10px;color:#888">PENDING WD</div><div style="font-size:22px;font-weight:900" class="red" id="pendingCount">0</div></div></div></div>
-<div class="card" style="border:1px solid #00e676"><h3>🚗 MARK X KDD 847M GOAL</h3><div class="hrow" style="margin-top:10px"><div><div style="font-size:10px;color:#888">TARGET PRICE</div><div style="font-size:14px">KES <input id="targetInput" type="number" value="1350000" oninput="saveTarget()" style="width:110px;font-size:14px;font-weight:800"></div></div><div><div style="font-size:10px;color:#888">CURRENT PROFIT</div><div style="font-size:22px;font-weight:900" class="green" id="markxProfit">KES 0</div></div></div><div class="progress"><div class="bar" id="markxBar"></div></div><div class="grid3"><div><div style="font-size:10px;color:#888">PROGRESS</div><div style="font-size:16px;font-weight:800" id="markxPercent">0%</div></div><div><div style="font-size:10px;color:#888">LEFT</div><div style="font-size:16px;font-weight:800" class="yellow" id="markxLeft">0</div></div><div><div style="font-size:10px;color:#888">USERS @17</div><div style="font-size:16px;font-weight:800" id="markxUsers">0</div></div></div></div>
-
-<!-- ADMIN BALANCE INJECTOR ADDED BELOW -->
-<div class="card" style="border:1px solid #00e676">
-  <h3 style="color:#00e676">⚡ ADMIN BALANCE INJECTOR</h3>
-  <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-    <input id="adminPhone" class="inp" style="flex:1;min-width:140px" placeholder="2547XXXXXXXX">
-    <input id="adminAddAmt" class="inp" style="flex:1" type="number" placeholder="Amount (KES)">
-    <button class="btn refresh" onclick="adminAddBalance()" style="background:#00e676;color:#000">ADD BALANCE</button>
-  </div>
-  <div id="adminMsg" style="font-size:11px;color:#00e676;margin-top:6px"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>National Dairy Admin | Kenya - Live</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+body{font-family:DM Sans,sans-serif;background:#f6f9f6}
+.card{background:white;border:1px solid #e3ebe4;border-radius:16px;padding:16px}
+.badge{padding:4px 10px;border-radius:100px;font-size:11px;font-weight:800;color:white}
+.badge-accepted{background:#15803d}.badge-a{background:#0e7490}.badge-b{background:#ca8a04}.badge-rejected{background:#dc2626}
+</style>
+</head>
+<body>
+<div class="bg-[#064c32] text-white text-center p-2 text-[11px]">🇰🇪 National Dairy Admin — 23 Co-ops Live • <span id="topTotal">Live</span> Today • M-Pesa Ready • Kenya Dairy Board</div>
+<header class="bg-white border-b p-4 flex justify-between items-center"><b>🇰🇪 National Dairy Admin — Kenya</b><a href="index.html" class="text-xs border rounded-full px-3 py-1">View Clerk Page</a></header>
+<div class="max-w-[1160px] w-[92%] mx-auto py-4">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+<div class="card text-center"><small class="text-[11px]">Total Collections Today</small><b id="aTotal" class="block text-[22px]">0 L</b><small class="text-green-600 text-[11px]">Live National Dairy</small></div>
+<div class="card text-center"><small class="text-[11px]">Accepted Milk</small><b id="aAcc" class="block text-[22px]">0 L</b><small id="aAccP" class="text-[11px]">0%</small></div>
+<div class="card text-center"><small class="text-[11px]">Grade B Milk</small><b id="aB" class="block text-[22px]">0 L</b><small id="aBP" class="text-[11px] text-[#a16207]">0%</small></div>
+<div class="card text-center"><small class="text-[11px]">Rejected Milk</small><b id="aRej" class="block text-[22px]">0 L</b><small id="aRejP" class="text-[11px] text-red-600">0%</small></div>
 </div>
-<!-- END OF ADMIN BALANCE INJECTOR -->
-
-<div class="card" style="border:1px solid #ffca28"><h3>💼 FLOAT HEALTH - MIN 100 MAX 500</h3><div class="grid3" style="margin-top:10px"><div><div style="font-size:10px;color:#888">TOTAL OWED</div><div style="font-size:22px;font-weight:900" id="totalBal">0</div></div><div><div style="font-size:10px;color:#888">NET CASH</div><div style="font-size:22px;font-weight:900" id="netCash2" class="cyan">0</div></div><div><div style="font-size:10px;color:#888">FLOAT NEEDED</div><div style="font-size:22px;font-weight:900" id="floatNeeded">0</div><div style="font-size:11px" id="floatStatus">-</div></div></div><div class="hrow" style="margin-top:12px"><div><div style="font-size:10px;color:#888">Your B2C Till (5000)</div><input id="b2cInput" type="number" value="5000" oninput="saveB2C()" style="width:120px"></div><div><div style="font-size:10px;color:#888">COVER</div><div style="font-size:20px;font-weight:900" id="floatCover">0</div><div style="font-size:10px" id="coverStatus">-</div></div></div></div>
-<div class="card" style="border:1px solid #ff5a5a"><h3>💸 WITHDRAW QUEUE - MIN 100 MAX 500</h3><div style="font-size:10px;color:#888">100-500 only. APPROVE deducts balance → pay via M-Pesa app.</div><table><thead><tr><th>TIME</th><th>PHONE</th><th>AMT → RECV</th><th>BAL</th><th>ACTION</th></tr></thead><tbody id="withQueue"></tbody></table></div>
-<div class="grid2"><div class="card"><div style="font-size:10px;color:#888">HOUSE PROFIT</div><div style="font-size:28px;font-weight:900" id="houseTotal">KES 0</div></div><div class="card"><div style="font-size:10px;color:#888">TODAY HOUSE</div><div style="font-size:28px;font-weight:900" id="houseToday">KES 0</div><div style="font-size:11px;color:#888" id="betsToday">0 bets</div></div><div class="card"><div style="font-size:10px;color:#888">TOTAL STAKED</div><div style="font-size:28px;font-weight:900" id="totalStaked" class="cyan">0</div><div style="font-size:11px;color:#888" id="betsCount">0 bets</div></div><div class="card"><div style="font-size:10px;color:#888">TOTAL PAID OUT</div><div style="font-size:28px;font-weight:900" id="totalPaid" class="red">0</div></div></div>
-<div class="card"><h3>📊 BY GAME TYPE</h3><table><thead><tr><th>TYPE</th><th>BETS</th><th>STAKED</th><th>PAYOUT</th><th>HOUSE</th><th>EDGE %</th></tr></thead><tbody id="byType"></tbody></table></div>
-<div class="card"><h3>💰 DEPOSITS vs WITHDRAWS</h3><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px"><div><div style="font-size:11px;color:#888">Deposits PAID</div><div style="font-size:26px;font-weight:900" class="green" id="depTotal">0</div><div style="font-size:11px" id="depCount">0</div></div><div><div style="font-size:11px;color:#888">Withdraws PAID</div><div style="font-size:26px;font-weight:900" class="red" id="withTotal">0</div><div style="font-size:11px" id="withCount">0</div></div><div><div style="font-size:11px;color:#888">Net Cash</div><div style="font-size:26px;font-weight:900" class="yellow" id="netCash">0</div></div></div></div>
-<div class="card"><h3>💳 LAST 20 DEPOSITS</h3><table><thead><tr><th>TIME</th><th>PHONE</th><th>AMOUNT</th><th>STATUS</th><th>CODE</th></tr></thead><tbody id="lastDeps"></tbody></table></div>
-<div class="card"><div class="hrow"><h3>👥 TOP USERS</h3><input id="searchPhone" placeholder="Search phone" oninput="renderUsers()" style="background:#222;border:1px solid #333;color:#fff;padding:8px 12px;border-radius:10px"></div><table><thead><tr><th>PHONE</th><th>BETS</th><th>STAKED</th><th>PAYOUT</th><th>HOUSE</th><th>BAL</th></tr></thead><tbody id="topUsers"></tbody></table></div>
-<div class="card"><h3>📅 LAST 50 BETS</h3><table><thead><tr><th>TIME</th><th>PHONE</th><th>TYPE</th><th>D</th><th>STAKE</th><th>PAYOUT</th><th>HOUSE</th></tr></thead><tbody id="lastBets"></tbody></table></div>
+<div class="grid md:grid-cols-[2fr_1fr] gap-4 mt-4">
+<div class="card">
+<div class="flex justify-between items-center mb-3"><h3 class="font-bold text-sm">All Deliveries — Edit/Delete Live - National Dairy</h3><button onclick="loadAdmin()" class="text-xs border rounded-full px-3 py-1">Refresh</button></div>
+<div class="overflow-auto">
+<table class="w-full text-[12px] min-w-[700px]"><thead><tr class="bg-[#e9ecea]"><th class="p-2 text-left">Batch</th><th class="text-left">Farmer</th><th>Vol</th><th>Fat%</th><th>Quality</th><th>Action</th></tr></thead><tbody id="adminBody"><tr><td colspan="6" class="p-6 text-center">Loading live from National Dairy...</td></tr></tbody></table>
+</div>
+<div class="mt-3 p-2 bg-[#f0f9f0] text-[11px]">Note: Kenya Dairy Board — Accepted, Grade A, Grade B, Rejected only. No A+ grade.</div>
+</div>
+<div class="space-y-4">
+<div class="card"><h3 class="font-bold text-sm">💰 M-Pesa Payout - National Dairy</h3><p class="text-[11px] text-gray-500 mt-1">KES 45 per litre • Auto calc from live total</p><div class="mt-3 text-[12px]"><div>Total Payable: <b id="payTotal">KES 0</b></div><div class="text-[11px] text-gray-500">Farmers: <span id="payCount">0</span></div></div><button onclick="processPayout()" class="w-full bg-[#087747] text-white rounded-xl p-3 mt-3 font-bold text-xs">Process M-Pesa Payout Now</button><p id="payMsg" class="text-[11px] text-green-700 mt-2"></p></div>
+<div class="card"><h3 class="font-bold text-sm">Cooperatives - National Dairy</h3><div id="coopList" class="mt-2 text-[12px] space-y-2"></div></div>
+</div>
+</div>
+</div>
 <script>
-const SUPA_URL="https://hkhqbtyyqgvaktamilxs.supabase.co";const SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhraHFidHl5cWd2YWt0YW1pbHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMTQwNDQsImV4cCI6MjEwNjU5MDA0NH0.gJcUf9XgzF34sczhD79V9oOnPD7a3XEU-5BXoQHWuAg";const supa=window.supabase.createClient(SUPA_URL,SUPA_KEY);
-let cacheBets=[],cacheDeps=[],cacheWiths=[],cacheUsers=[],byPhoneCache={},lastHouse=0;
-function saveB2C(){localStorage.setItem('b2cTill',document.getElementById('b2cInput').value);renderFloat();renderWithQueue();}
-function loadB2C(){let v=localStorage.getItem('b2cTill');if(v)document.getElementById('b2cInput').value=v;}
-function saveTarget(){localStorage.setItem('markxTarget',document.getElementById('targetInput').value);renderMarkX();}
-function loadTarget(){let v=localStorage.getItem('markxTarget');if(v)document.getElementById('targetInput').value=v;}
-function renderMarkX(){let t=parseFloat(document.getElementById('targetInput').value||'1350000')||1350000;let p=lastHouse;let pct=Math.max(0,Math.min(100,(p/t)*100));document.getElementById('markxProfit').innerText='KES '+p;document.getElementById('markxPercent').innerText=pct.toFixed(4)+'%';document.getElementById('markxLeft').innerText='KES '+Math.max(0,t-p);document.getElementById('markxUsers').innerText=Math.ceil(Math.max(0,t-p)/17).toLocaleString();document.getElementById('markxBar').style.width=pct+'%';}
-async function loadAll(){try{const [b,d,w1,w2,ub]=await Promise.all([supa.from('bets').select('*').order('created_at',{ascending:false}).limit(500),supa.from('deposits').select('*').order('created_at',{ascending:false}).limit(100),supa.from('withdraws').select('*').order('created_at',{ascending:false}),supa.from('withdrawals').select('*').order('created_at',{ascending:false}),supa.from('user_balances').select('*')]);cacheBets=b.data||[];cacheDeps=d.data||[];let a=(w1.data||[]).map(r=>({...r,_table:'withdraws'})),cc=(w2.data||[]).map(r=>({...r,_table:'withdrawals'}));cacheWiths=[...a,...cc].sort((x,y)=>new Date(y.created_at)-new Date(x.created_at));cacheUsers=ub.data||[];document.getElementById('cloudStatus').innerText=`LIVE - ${cacheBets.length} bets - ${new Date().toLocaleTimeString()}`;renderAll();}catch(e){document.getElementById('cloudStatus').innerText='ERR: '+e.message;}}
-function renderFloat(){let tb=cacheUsers.reduce((a,b)=>a+(b.balance||0),0);let ds=cacheDeps.filter(d=>d.status==='paid').reduce((a,b)=>a+(b.amount||0),0);let ws=cacheWiths.filter(w=>w.status==='paid').reduce((a,b)=>a+(b.amount||0),0);let nc=ds-ws;let need=tb-nc;let b2c=parseFloat(document.getElementById('b2cInput').value||'0')||0;let cover=b2c-Math.max(0,need);document.getElementById('totalBal').innerText=tb;document.getElementById('netCash2').innerText=nc;document.getElementById('floatNeeded').innerText=need;document.getElementById('floatCover').innerText=cover;let s=document.getElementById('floatStatus');if(need<=0){s.innerText='SAFE ✅';s.className='green';}else if(need<500){s.innerText='TOP UP ⚠️ '+need;s.className='yellow';}else{s.innerText='DANGER 🔴 '+need;s.className='red';}let cs=document.getElementById('coverStatus');cs.innerText=cover>=0?'Can pay ✅':'Add '+Math.abs(cover);cs.className=cover>=0?'green':'red';document.getElementById('floatCover').className=cover>=0?'green':'red';}
-function renderWithQueue(){let html='',b2c=parseFloat(document.getElementById('b2cInput').value||'0')||0;let pending=cacheWiths.filter(w=>(w.status||'pending')==='pending').slice(0,20);document.getElementById('pendingCount').innerText=pending.length;if(pending.length===0){document.getElementById('withQueue').innerHTML='<tr><td colspan=5 style="text-align:center;color:#555;padding:15px">No pending ✅</td></tr>';return;}pending.forEach(w=>{let t=new Date(w.created_at).toLocaleTimeString('en-GB',{hour12:false});let ph=w.phone||'';let amt=w.amount||0;let recv=w.receive||Math.floor(amt*0.9);let ubal=(cacheUsers.find(u=>u.phone===ph)?.balance)||0;let invalid=amt<100?'MIN 100 ❌':amt>500?'MAX 500 ❌':null;if(invalid){html+=`<tr><td>${t}</td><td>${ph.slice(-9)}</td><td>${amt} → <span style="color:#ff5a5a">${recv}</span></td><td class="yellow">${ubal}</td><td><span style="font-size:10px;color:#ff5a5a">${invalid}</span> <button onclick="rejectWith('${w.id}','${w._table}')" style="background:#222;color:#ff5a5a;border:1px solid #333;padding:6px 8px">REJECT</button></td></tr>`;return;}let canPay=b2c>=recv&&ubal>=amt;let btn=canPay?`<button onclick="approveWith('${w.id}','${ph}',${amt},${recv},'${w._table}')" style="background:#00e676;color:#000;padding:6px 10px;font-size:11px">APPROVE ${recv}</button> <button onclick="rejectWith('${w.id}','${w._table}')" style="background:#222;color:#ff5a5a;border:1px solid #333;padding:6px 8px">X</button>`:`<span style="font-size:10px;color:#ff5a5a">${b2c<recv?'NO FLOAT ❌ '+(recv-b2c):'LOW BAL'}</span>`;html+=`<tr><td>${t}</td><td>${ph.slice(-9)}</td><td>${amt} → <span class="green">${recv}</span></td><td class="yellow">${ubal}</td><td>${btn}</td></tr>`;});document.getElementById('withQueue').innerHTML=html;}
-async function approveWith(id,phone,amount,receive,table){if(!confirm(`Approve KES ${amount} -> user gets ${receive} to ${phone}?`)) return;let user=cacheUsers.find(u=>u.phone===phone);if(user){let {error}=await supa.from('user_balances').update({balance:user.balance-amount}).eq('phone',phone);if(error){alert('Balance fail: '+error.message);return;}}let t=table||'withdraws';let {error}=await supa.from(t).update({status:'paid'}).eq('id',id);if(error){let other=t==='withdraws'?'withdrawals':'withdraws';await supa.from(other).update({status:'paid'}).eq('id',id);}alert(`APPROVED KES ${amount}\nUser receives ${receive}\nNOW SEND via M-Pesa App to ${phone}`);loadAll();}
-async function rejectWith(id,table){if(!confirm('Reject?')) return;let t=table||'withdraws';await supa.from(t).update({status:'rejected'}).eq('id',id);let other=t==='withdraws'?'withdrawals':'withdraws';await supa.from(other).update({status:'rejected'}).eq('id',id);loadAll();}
-function renderAll(){let ts=0,tp=0,th=0,tb=0;let byType={},byPhone={};let today=new Date().toISOString().slice(0,10);const ADMIN=['254116982197','0116982197'];let todayPhones=new Set();cacheBets.forEach(b=>{if(ADMIN.includes(b.phone))return;ts+=b.stake||0;tp+=b.payout||0;if((b.created_at||'').slice(0,10)===today){tb++;th+=b.house||0;todayPhones.add(b.phone);}byType[b.type]=byType[b.type]||{bets:0,staked:0,payout:0,house:0};byType[b.type].bets++;byType[b.type].staked+=b.stake||0;byType[b.type].payout+=b.payout||0;byType[b.type].house+=b.house||0;byPhone[b.phone]=byPhone[b.phone]||{bets:0,staked:0,payout:0,house:0};byPhone[b.phone].bets++;byPhone[b.phone].staked+=b.stake||0;byPhone[b.phone].payout+=b.payout||0;byPhone[b.phone].house+=b.house||0;});byPhoneCache=byPhone;lastHouse=ts-tp;document.getElementById('houseTotal').innerText='KES '+lastHouse;document.getElementById('houseToday').innerText='KES '+th;document.getElementById('betsToday').innerText=tb+' bets';document.getElementById('totalStaked').innerText=ts;document.getElementById('betsCount').innerText=cacheBets.length+' bets';document.getElementById('totalPaid').innerText=tp;document.getElementById('totalUsers').innerText=cacheUsers.filter(u=>!ADMIN.includes(u.phone)).length;document.getElementById('activeToday').innerText=todayPhones.size;document.getElementById('usersWithBal').innerText=cacheUsers.filter(u=>!ADMIN.includes(u.phone)&&(u.balance||0)>0).length;let h='';Object.entries(byType).forEach(([k,v])=>{let e=v.staked?((v.house/v.staked)*100).toFixed(1):'0.0';h+=`<tr><td>${k}</td><td>${v.bets}</td><td>${v.staked}</td><td>${v.payout}</td><td class="${v.house>=0?'green':'red'}">${v.house}</td><td>${e}%</td></tr>`});document.getElementById('byType').innerHTML=h||'<tr><td colspan=6 style="text-align:center;color:#555">No bets</td></tr>';let ds=cacheDeps.filter(d=>d.status==='paid').reduce((a,b)=>a+(b.amount||0),0),ws=cacheWiths.filter(w=>w.status==='paid').reduce((a,b)=>a+(b.amount||0),0);document.getElementById('depTotal').innerText=ds;document.getElementById('withTotal').innerText=ws;document.getElementById('netCash').innerText=ds-ws;document.getElementById('depCount').innerText=cacheDeps.filter(d=>d.status==='paid').length+' paid';document.getElementById('withCount').innerText=cacheWiths.filter(w=>w.status==='paid').length+' paid';renderFloat();renderMarkX();renderWithQueue();renderDeps();renderUsers();renderBets();}
-function renderDeps(){let h='';cacheDeps.slice(0,20).forEach(d=>{let t=new Date(d.created_at).toLocaleTimeString('en-GB',{hour12:false});let col=d.status==='paid'?'green':d.status==='pending'?'yellow':'red';h+=`<tr><td>${t}</td><td>${(d.phone||'').slice(-9)}</td><td>${d.amount}</td><td class="${col}">${d.status}</td><td>${(d.mpesa_code||'').slice(0,10)}</td></tr>`});document.getElementById('lastDeps').innerHTML=h||'<tr><td colspan=5 style="text-align:center;color:#555">No deps</td></tr>';}
-function renderUsers(){let s=(document.getElementById('searchPhone')?.value||'').toLowerCase();let h='';let c={};cacheUsers.forEach(u=>{if(['254116982197','0116982197'].includes(u.phone))return;c[u.phone]=c[u.phone]||{bets:0,staked:0,payout:0,house:0,balance:0};c[u.phone].balance=u.balance||0;});Object.entries(byPhoneCache).forEach(([ph,st])=>{if(['254116982197','0116982197'].includes(ph))return;c[ph]=c[ph]||{bets:0,staked:0,payout:0,house:0,balance:0};c[ph].bets=st.bets;c[ph].staked=st.staked;c[ph].payout=st.payout;c[ph].house=st.house;});Object.entries(c).sort((a,b)=>b[1].house-a[1].house).forEach(([ph,st])=>{if(s&&!ph.toLowerCase().includes(s))return;h+=`<tr><td>${ph}</td><td>${st.bets||0}</td><td>${st.staked||0}</td><td>${st.payout||0}</td><td class="${(st.house||0)>=0?'green':'red'}">${st.house||0}</td><td class="yellow">${st.balance||0}</td></tr>`});document.getElementById('topUsers').innerHTML=h||'<tr><td colspan=6 style="text-align:center;color:#555">No users</td></tr>';}
-function renderBets(){let h='';cacheBets.slice(0,50).forEach(b=>{let t=new Date(b.created_at).toLocaleTimeString('en-GB',{hour12:false});h+=`<tr><td>${t}</td><td>${(b.phone||'').slice(-4)}</td><td>${b.type}</td><td>${b.d}</td><td>${b.stake}</td><td>${b.payout}</td><td class="${b.house>=0?'green':'red'}">${b.house}</td></tr>`});document.getElementById('lastBets').innerHTML=h||'<tr><td colspan=7 style="text-align:center;color:#555">No bets</td></tr>';}
-function exportCSV(){let csv='Time,Phone,Type,D,Stake,Payout,House\n';cacheBets.forEach(b=>{csv+=`${b.created_at},${b.phone},${b.type},${b.d},${b.stake},${b.payout},${b.house}\n`});let blob=new Blob([csv],{type:'text/csv'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bets.csv';a.click();}
-
-// ADMIN BALANCE INJECTOR LOGIC ADDED BELOW
-async function adminAddBalance() {
-    let phoneRaw = document.getElementById('adminPhone').value.trim();
-    let amount = parseInt(document.getElementById('adminAddAmt').value) || 0;
-    let msg = document.getElementById('adminMsg');
-
-    if (!phoneRaw || amount <= 0) {
-        alert('Please enter a valid phone number and amount.');
-        return;
-    }
-
-    let phone = phoneRaw.replace(/[^0-9]/g, '');
-    if (phone.startsWith('0')) phone = '254' + phone.substring(1);
-    if (phone.startsWith('7' ) && phone.length == 9) phone = '254' + phone;
-
-    msg.style.color = '#00e676';
-    msg.textContent = `Injecting KES ${amount} to ${phone}...`;
-
-    try {
-        let { data, error: fetchError } = await supa.from('user_balances').select('balance').eq('phone', phone).maybeSingle();
-        let currentBal = data ? data.balance : 0;
-        let newBalance = currentBal + amount;
-
-        let { error: upsertError } = await supa.from('user_balances').upsert([{ phone: phone, balance: newBalance }]);
-
-        if (upsertError) {
-            msg.style.color = '#ff5a5a';
-            msg.textContent = '❌ Error: ' + upsertError.message;
-        } else {
-            msg.style.color = '#00e676';
-            msg.textContent = `✅ Successfully added KES ${amount}! New Balance for ${phone}: KES ${newBalance}`;
-            document.getElementById('adminAddAmt').value = '';
-            loadAll();
-        }
-    } catch (e) {
-        msg.style.color = '#ff5a5a';
-        msg.textContent = '❌ Network error: ' + e.message;
-    }
+let supa; let adminData=[];
+function badge(q){ q=(q||'').toLowerCase(); if(q.includes('accept')) return `<span class="badge badge-accepted">Accepted</span>`; if(q.includes('grade a')) return `<span class="badge badge-a">Grade A</span>`; if(q.includes('grade b')) return `<span class="badge badge-b">Grade B</span>`; return `<span class="badge badge-rejected">Rejected</span>`; }
+async function loadAdmin(){
+  try{
+    const { data, error } = await supa.from('deliveries').select('*').order('created_at',{ascending:false}).limit(200);
+    if(error) throw error;
+    adminData=data||[];
+    const tbody=document.getElementById('adminBody');
+    if(adminData.length===0){ tbody.innerHTML=`<tr><td colspan=6 class="p-4 text-center">No deliveries yet — save from clerk page</td></tr>`; updateStats({total:0,acc:0,b:0,rej:0}); return; }
+    let total=0, acc=0, b=0, rej=0;
+    adminData.forEach(r=>{ const vol=Number(r.volume ?? r.litres ?? 0); total+=vol; const q=(r.quality||'').toLowerCase(); if(q.includes('accept')) acc+=vol; else if(q.includes('grade b')) b+=vol; else if(q.includes('reject')) rej+=vol; });
+    tbody.innerHTML=adminData.map(r=>{
+      const vol=Number(r.volume ?? r.litres ?? 0); const farmer=r.farmer_name || r.farmer || 'Unknown'; const batch=r.batch_id || (r.id||'').slice(0,8) || 'BD-'; const fat=r.fat_percent ?? r.fat ?? 3.5;
+      return `<tr class="border-t"><td class="p-2">${batch}</td><td class="p-2">${farmer}</td><td class="p-2">${vol}L</td><td class="p-2">${Number(fat).toFixed(1)}%</td><td class="p-2">${badge(r.quality)}</td><td class="p-2 flex gap-1"><button onclick="editRow('${r.id}')" class="border rounded-full px-2 py-1 text-[11px]">Edit</button><button onclick="deleteRow('${r.id}')" class="bg-red-600 text-white rounded-full px-2 py-1 text-[11px]">Delete</button></td></tr>`;
+    }).join('');
+    updateStats({total,acc,b,rej,count:adminData.length});
+  }catch(e){ document.getElementById('adminBody').innerHTML=`<tr><td colspan=6 class="p-4 text-red-600">Error: ${e.message}<br>Run: alter table deliveries disable row level security;</td></tr>`; }
 }
-// END OF ADMIN BALANCE INJECTOR LOGIC
-
-loadB2C();loadTarget();loadAll();setInterval(loadAll,3000);
-</script></body></html>
+function updateStats({total=0,acc=0,b=0,rej=0,count=0}={}){ document.getElementById('aTotal').innerText=total+" L"; document.getElementById('topTotal').innerText=total+"L"; document.getElementById('aAcc').innerText=acc+" L"; document.getElementById('aB').innerText=b+" L"; document.getElementById('aRej').innerText=rej+" L"; document.getElementById('aAccP').innerText=(total?Math.round(acc/total*100):0)+"% of total"; document.getElementById('aBP').innerText=(total?Math.round(b/total*100):0)+"%"; document.getElementById('aRejP').innerText=(total?Math.round(rej/total*100):0)+"%"; document.getElementById('payTotal').innerText="KES "+(total*45).toLocaleString(); document.getElementById('payCount').innerText=count; }
+async function deleteRow(id){ if(!confirm('Delete from National Dairy?'))return; const {error}=await supa.from('deliveries').delete().eq('id',id); if(error) alert(error.message); else loadAdmin(); }
+async function editRow(id){ const row=adminData.find(r=>r.id===id); const newVol=prompt(`Edit volume for ${row.farmer_name||row.farmer} (current ${row.volume||row.litres}L):`, row.volume??row.litres); if(newVol===null) return; const newQuality=prompt(`Edit quality (Accepted, Grade A, Grade B, Rejected):`, row.quality); if(newQuality===null) return; const {error}=await supa.from('deliveries').update({ volume:Number(newVol), quality:newQuality }).eq('id',id); if(error) alert(error.message); else loadAdmin(); }
+async function loadCoopsAdmin(){ try{ const {data}=await supa.from('cooperatives').select('*'); if(!data) return; document.getElementById('coopList').innerHTML=data.map(c=>`<div class="flex justify-between border-b py-1"><span>${c.name}</span><b>${c.farmers||''}</b></div>`).join(''); }catch(e){} }
+function processPayout(){ document.getElementById('payMsg').innerText="Processing M-Pesa for "+document.getElementById('aTotal').innerText+" = "+document.getElementById('payTotal').innerText+" - National Dairy"; }
+async function initSupabase(){ let cfg; try{ const res=await fetch('/api/config'); cfg=await res.json(); if(!cfg.url||!cfg.anonKey) throw 0; }catch{ cfg={url:"https://hkhqbtyyqgvaktamilxs.supabase.co", anonKey:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhraHFidHl5cWd2YWt0YW1pbHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMTQwNDQsImV4cCI6MjEwNjU5MDA0NH0.gJcUf9XgzF34sczhD79V9oOnPD7a3XEU-5BXoQHWuAg"}; } supa=supabase.createClient(cfg.url,cfg.anonKey); loadAdmin(); supa.channel('national-dairy-live').on('postgres_changes',{event:'*',schema:'public',table:'deliveries'},()=>loadAdmin()).subscribe(); loadCoopsAdmin(); }
+initSupabase();
+</script>
+</body>
+</html>
