@@ -8,10 +8,10 @@
 <style>body{font-family:DM Sans,sans-serif;background:#f5f8f5}</style>
 </head>
 <body>
-<div class="bg-[#0a4d2e] text-white text-center text-[11px] py-1.5">🇰🇪 NATIONAL DAIRY Live — 23 Co-ops • M-Pesa • Live from Supabase • Kenya Dairy Board</div>
+<div class="bg-[#0a4d2e] text-white text-center text-[11px] py-1.5">🇰🇪 NATIONAL DAIRY Live — 23 Co-ops • Isolated Milk • Kenya Dairy Board</div>
 <header class="bg-white border-b flex justify-between items-center px-4 py-3">
   <div class="font-bold text-[14px]">🇰🇪 National Dairy Cooperative - Kenya</div>
-  <div class="text-[12px] font-bold"><span onclick="showRegister()" class="cursor-pointer text-[#0a7a42] mr-3">+ Register New Co-op</span> QC Officer | <span onclick="logoutCoop()" class="cursor-pointer">Logout</span></div>
+  <div class="text-[12px] font-bold"><span onclick="showRegister()" class="cursor-pointer text-[#0a7a42] mr-3">+ Register</span> QC Officer | <span onclick="logoutCoop()" class="cursor-pointer">Logout</span></div>
 </header>
 
 <div class="max-w-[1150px] w-[92%] mx-auto py-4">
@@ -19,7 +19,7 @@
   <div class="bg-white rounded-2xl border p-3 mb-4 flex flex-col md:flex-row gap-2 md:items-center justify-between">
     <div class="flex items-center gap-2">
       <span class="text-[11px] font-bold bg-[#0a4d2e] text-white px-2 py-1 rounded">CO-OP ID DIVIDER</span>
-      <select id="coopSelect" onchange="switchCoop()" class="border rounded-xl p-2.5 text-[12px] font-bold min-w-[200px]"><option value="">Select Cooperative...</option></select>
+      <select id="coopSelect" onchange="switchCoop()" class="border rounded-xl p-2.5 text-[12px] font-bold min-w-[220px]"><option value="">Select Cooperative...</option></select>
     </div>
     <div class="text-[11px] text-gray-600">Active: <b id="activeCoopName" class="text-[#0a7a42]">None</b> • <span id="coopCode" class="font-mono"></span></div>
   </div>
@@ -27,17 +27,17 @@
   <div id="registerBox" class="hidden bg-white rounded-2xl border-2 border-dashed border-[#0a7a42] p-4 mb-4">
     <h3 class="font-bold text-[13px]">🆕 Register New Cooperative — Make Your Own Password</h3>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
-      <input id="regName" placeholder="Coop Name e.g. Podago Dairy" class="border rounded-xl p-2.5 text-[12px]">
-      <input id="regCode" placeholder="Code e.g. PODAGO" class="border rounded-xl p-2.5 text-[12px] uppercase font-bold">
-      <div class="relative"><input id="regPass" type="password" placeholder="Create Your Password" class="border rounded-xl p-2.5 text-[12px] w-full pr-10"><span onclick="toggleEye('regPass','eye1')" id="eye1" class="absolute right-3 top-2.5 cursor-pointer text-[16px] select-none">👁️</span></div>
+      <input id="regName" placeholder="Coop Name" class="border rounded-xl p-2.5 text-[12px]">
+      <input id="regCode" placeholder="Code e.g. NEWKCC" class="border rounded-xl p-2.5 text-[12px] uppercase font-bold">
+      <div class="relative"><input id="regPass" type="password" placeholder="Create Password" class="border rounded-xl p-2.5 text-[12px] w-full pr-10"><span onclick="toggleEye('regPass','eye1')" id="eye1" class="absolute right-3 top-2.5 cursor-pointer text-[16px]">👁️</span></div>
     </div>
-    <div class="flex gap-2 mt-2"><button onclick="registerCoop()" class="bg-[#0a7a42] text-white rounded-xl px-6 py-2.5 text-[12px] font-bold">Create Co-op Account</button><button onclick="hideRegister()" class="border rounded-xl px-6 py-2.5 text-[12px]">Cancel</button></div>
+    <div class="flex gap-2 mt-2"><button onclick="registerCoop()" class="bg-[#0a7a42] text-white rounded-xl px-6 py-2.5 text-[12px] font-bold">Create</button><button onclick="hideRegister()" class="border rounded-xl px-6 py-2.5 text-[12px]">Cancel</button></div>
     <p id="regMsg" class="text-[11px] mt-2"></p>
   </div>
 
   <div id="loginOverlay" class="hidden bg-white rounded-2xl border-2 border-[#0a4d2e] p-4 mb-4">
     <h3 class="font-bold text-[13px]" id="loginTitle">🔒 Enter Password for <span id="loginCoopName" class="text-[#0a7a42]"></span></h3>
-    <div class="flex gap-2 mt-2"><div class="relative flex-1"><input id="coopPassword" type="password" placeholder="Password" class="border rounded-xl p-2.5 text-[12px] w-full pr-10"><span onclick="toggleEye('coopPassword','eye2')" id="eye2" class="absolute right-3 top-2.5 cursor-pointer text-[16px] select-none">👁️</span></div><button onclick="loginCoop()" id="loginBtn" class="bg-[#0a4d2e] text-white rounded-xl px-6 py-2.5 text-[12px] font-bold">Unlock</button></div>
+    <div class="flex gap-2 mt-2"><div class="relative flex-1"><input id="coopPassword" type="password" placeholder="Password" class="border rounded-xl p-2.5 text-[12px] w-full pr-10"><span onclick="toggleEye('coopPassword','eye2')" id="eye2" class="absolute right-3 top-2.5 cursor-pointer text-[16px]">👁️</span></div><button onclick="loginCoop()" id="loginBtn" class="bg-[#0a4d2e] text-white rounded-xl px-6 py-2.5 text-[12px] font-bold">Unlock</button></div>
     <p id="loginMsg" class="text-[11px] text-red-600 mt-2"></p>
   </div>
 
@@ -49,17 +49,16 @@
   </div>
 
   <div class="bg-white rounded-2xl border p-4">
-    <h2 class="font-bold text-[14px] mb-3">Dairy Quality Monitoring — Updated: <span id="updated">24 Oct 2026, 11:57</span> • <span id="headerCoop">National Dairy Live</span></h2>
+    <h2 class="font-bold text-[14px] mb-3">Dairy Quality Monitoring — Updated: <span id="updated">30 Oct 07:23</span> • <span id="headerCoop">Select Co-op</span></h2>
     <div class="flex gap-2 overflow-x-auto pb-2 mb-3 border-b"><button data-filter="All Milk" onclick="applyFilter('All Milk')" class="filter-btn bg-[#0a7a42] text-white rounded-full px-5 py-2 text-[12px] font-bold whitespace-nowrap">All Milk</button><button data-filter="Accepted" onclick="applyFilter('Accepted')" class="filter-btn border rounded-full px-5 py-2 text-[12px] whitespace-nowrap bg-white">Accepted</button><button data-filter="Grade A" onclick="applyFilter('Grade A')" class="filter-btn border rounded-full px-5 py-2 text-[12px] whitespace-nowrap bg-white">Grade A</button><button data-filter="Grade B" onclick="applyFilter('Grade B')" class="filter-btn border rounded-full px-5 py-2 text-[12px] whitespace-nowrap bg-white">Grade B</button><button data-filter="Rejected" onclick="applyFilter('Rejected')" class="filter-btn border rounded-full px-5 py-2 text-[12px] whitespace-nowrap bg-white">Rejected</button></div>
-    <div class="overflow-auto border rounded-xl"><table class="w-full text-[12px] min-w-[500px]"><thead class="bg-[#eef2ee]"><tr><th class="text-left p-2.5">Batch ID</th><th class="text-left">Farmer Name</th><th class="text-left">Vol</th><th class="text-left">Quality</th></tr></thead><tbody id="clerkBody"><tr><td colspan="4" class="p-6 text-center">Select a Cooperative</td></tr></tbody></table><div class="p-2.5 bg-[#f0f7f0] text-[11px]">Each co-op makes own password. Data isolated by cooperative_id.</div></div>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4"><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Total Collections Today</div><b id="cTotal" class="text-[22px] block">0 L</b></div><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Accepted Milk</div><b id="cAcc" class="text-[20px] block">0 L</b></div><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Grade B Milk</div><b id="cB" class="text-[20px] block">0 L</b></div><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Rejected Milk</div><b id="cRej" class="text-[20px] block">0 L</b></div></div>
-    <div class="border rounded-xl p-4 mt-3"><h3 class="font-bold text-[15px]">Quality Breakdown</h3><div id="breakdown" class="mt-2 text-[13px]"></div></div>
+    <div class="overflow-auto border rounded-xl"><table class="w-full text-[12px] min-w-[500px]"><thead class="bg-[#eef2ee]"><tr><th class="text-left p-2.5">Batch ID</th><th class="text-left">Farmer Name</th><th class="text-left">Vol</th><th class="text-left">Quality</th></tr></thead><tbody id="clerkBody"><tr><td colspan="4" class="p-6 text-center">Select a Cooperative to view its milk only</td></tr></tbody></table><div class="p-2.5 bg-[#f0f7f0] text-[11px]">Isolated by cooperative_id — No cross-coop leaking.</div></div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4"><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Total</div><b id="cTotal" class="text-[22px] block">0 L</b></div><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Accepted</div><b id="cAcc" class="text-[20px] block">0 L</b></div><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Grade B</div><b id="cB" class="text-[20px] block">0 L</b></div><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Rejected</div><b id="cRej" class="text-[20px] block">0 L</b></div></div>
   </div>
 </div>
 
 <script>
 let supa, allDeliveries=[], activeFilter='All Milk', activeCoopId=null, activeCoopCode=null, coopMap={};
-function toggleEye(inputId, eyeId){ const inp=document.getElementById(inputId); const eye=document.getElementById(eyeId); if(inp.type==='password'){ inp.type='text'; eye.innerText='🙈'; } else { inp.type='password'; eye.innerText='👁️'; } }
+function toggleEye(i,e){ const inp=document.getElementById(i); const eye=document.getElementById(e); if(inp.type==='password'){inp.type='text';eye.innerText='🙈';}else{inp.type='password';eye.innerText='👁️';} }
 function showRegister(){ document.getElementById('registerBox').classList.remove('hidden'); }
 function hideRegister(){ document.getElementById('registerBox').classList.add('hidden'); }
 function logoutCoop(){ if(activeCoopId) localStorage.removeItem('nd_login_'+activeCoopId); localStorage.removeItem('nd_coop_id'); location.reload(); }
@@ -68,51 +67,53 @@ async function registerCoop(){
   const name=document.getElementById('regName').value.trim();
   let code=document.getElementById('regCode').value.trim().toUpperCase();
   const pass=document.getElementById('regPass').value.trim();
-  if(!name||!code||!pass) return document.getElementById('regMsg').innerText='Fill all fields';
-  if(pass.length<4) return document.getElementById('regMsg').innerText='Password at least 4 chars';
+  if(!name||!code||!pass) return document.getElementById('regMsg').innerText='Fill all';
   const id=code.toLowerCase();
   const {error}=await supa.from('cooperatives').insert([{id, code, name, password:pass, is_active:true}]);
-  if(error) document.getElementById('regMsg').innerText=error.message.includes('duplicate')?'Code exists!':' '+error.message;
-  else { document.getElementById('regMsg').innerText='✅ Created '+code; hideRegister(); loadCoops(); }
+  if(error) document.getElementById('regMsg').innerText=error.message; else { document.getElementById('regMsg').innerText='✅ Created '+code; hideRegister(); loadCoops(); }
 }
 
 function switchCoop(){
   const sel=document.getElementById('coopSelect');
-  if(!sel.value){ document.getElementById('loginOverlay').classList.add('hidden'); return; }
+  const body=document.getElementById('clerkBody');
+  if(!sel.value){
+    document.getElementById('loginOverlay').classList.add('hidden');
+    body.innerHTML=`<tr><td colspan="4" class="p-6 text-center">Select a Cooperative</td></tr>`;
+    return;
+  }
   const coop=coopMap[sel.value];
   if(!coop) return;
-  if(coop.is_active===false){ alert('❌ Deactivated by Admin'); sel.value=''; return; }
+  if(coop.is_active===false){ alert('Deactivated'); sel.value=''; return; }
 
+  // CRITICAL FIX: WIPE EVERYTHING INSTANTLY
   activeCoopId=coop.id; activeCoopCode=coop.code; allDeliveries=[];
-  document.getElementById('cTotal').innerText='0 L'; document.getElementById('cAcc').innerText='0 L';
-  document.getElementById('cB').innerText='0 L'; document.getElementById('cRej').innerText='0 L';
-  document.getElementById('breakdown').innerHTML=''; document.getElementById('msg').innerText='';
-
   document.getElementById('activeCoopName').innerText=coop.name;
   document.getElementById('coopCode').innerText=coop.code;
   document.getElementById('coopLabel').innerText=coop.code;
   document.getElementById('headerCoop').innerText=coop.name;
   document.getElementById('updated').innerText=new Date().toLocaleString('en-KE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-  document.getElementById('loginCoopName').innerText=coop.name;
+  document.getElementById('cTotal').innerText='0 L'; document.getElementById('cAcc').innerText='0 L'; document.getElementById('cB').innerText='0 L'; document.getElementById('cRej').innerText='0 L';
+  body.innerHTML=`<tr><td colspan="4" class="p-6 text-center">Loading ${coop.code} milk...</td></tr>`;
 
+  // Show login
   const overlay=document.getElementById('loginOverlay');
+  document.getElementById('loginCoopName').innerText=coop.name;
   overlay.classList.remove('hidden');
   document.getElementById('coopPassword').value=''; document.getElementById('coopPassword').type='password'; document.getElementById('eye2').innerText='👁️';
 
   if(!coop.password){
-    document.getElementById('loginTitle').innerHTML='🆕 Create Password for <span class="text-[#0a7a42]">'+coop.name+'</span>';
-    document.getElementById('coopPassword').placeholder='Create your password'; document.getElementById('loginBtn').innerText='Set Password';
-    document.getElementById('loginMsg').innerText='No password yet — create one now';
-    document.getElementById('clerkBody').innerHTML=`<tr><td colspan="4" class="p-6 text-center">🆕 ${coop.code} NEW — Create password</td></tr>`;
+    document.getElementById('loginTitle').innerHTML='🆕 Create Password for '+coop.name;
+    document.getElementById('loginBtn').innerText='Set Password'; document.getElementById('loginMsg').innerText='Create password first';
+    body.innerHTML=`<tr><td colspan="4" class="p-8 text-center text-gray-500">🔒 ${coop.code} is NEW — Create password to see its milk</td></tr>`;
   } else {
-    document.getElementById('loginTitle').innerHTML='🔒 Enter Password for <span class="text-[#0a7a42]">'+coop.name+'</span>';
-    document.getElementById('coopPassword').placeholder='Enter password'; document.getElementById('loginBtn').innerText='Unlock'; document.getElementById('loginMsg').innerText='';
-    document.getElementById('clerkBody').innerHTML=`<tr><td colspan="4" class="p-6 text-center">🔒 ${coop.code} locked — Enter password</td></tr>`;
+    document.getElementById('loginTitle').innerHTML='🔒 Enter Password for '+coop.name;
+    document.getElementById('loginBtn').innerText='Unlock'; document.getElementById('loginMsg').innerText='';
+    body.innerHTML=`<tr><td colspan="4" class="p-8 text-center text-gray-500">🔒 Enter password to view ${coop.code} milk</td></tr>`;
   }
+
   if(localStorage.getItem('nd_login_'+activeCoopId)===coop.password && coop.password){
     overlay.classList.add('hidden'); localStorage.setItem('nd_coop_id', activeCoopId); loadClerk();
   }
-  document.getElementById('coopPassword').focus();
 }
 
 async function loginCoop(){
@@ -130,23 +131,76 @@ async function loginCoop(){
     else document.getElementById('loginMsg').innerText='Wrong password!';
   }
 }
+
 async function loadCoops(){
-  try{
-    const {data}=await supa.from('cooperatives').select('*').order('name');
-    if(!data) return;
-    coopMap={}; data.forEach(c=> coopMap[c.id]=c);
-    const activeOnly=data.filter(c=> c.is_active!==false);
-    const sel=document.getElementById('coopSelect');
-    sel.innerHTML='<option value="">Select Cooperative...</option>' + activeOnly.map(c=>`<option value="${c.id}">${c.code} - ${c.name} ${c.password?'🔒':'🆕'}</option>`).join('');
-    const saved=localStorage.getItem('nd_coop_id');
-    if(saved && coopMap[saved] && coopMap[saved].is_active!==false){ sel.value=saved; switchCoop(); }
-  }catch(e){ console.log(e); }
+  const {data}=await supa.from('cooperatives').select('*').order('name');
+  if(!data) return; coopMap={}; data.forEach(c=> coopMap[c.id]=c);
+  const activeOnly=data.filter(c=> c.is_active!==false);
+  const sel=document.getElementById('coopSelect');
+  sel.innerHTML='<option value="">Select Cooperative...</option>' + activeOnly.map(c=>`<option value="${c.id}">${c.code} - ${c.name} ${c.password?'🔒':'🆕'}</option>`).join('');
+  const saved=localStorage.getItem('nd_coop_id');
+  if(saved && coopMap[saved] && coopMap[saved].is_active!==false){ sel.value=saved; switchCoop(); }
 }
-function applyFilter(f){ activeFilter=f; document.querySelectorAll('.filter-btn').forEach(btn=>{ if(btn.dataset.filter===f) btn.className='filter-btn bg-[#0a7a42] text-white rounded-full px-5 py-2 text-[12px] font-bold whitespace-nowrap'; else btn.className='filter-btn border rounded-full px-5 py-2 text-[12px] whitespace-nowrap bg-white'; }); renderTable(); }
-function renderTable(){ let data=allDeliveries; if(activeFilter!=='All Milk') data=allDeliveries.filter(r=>(r.quality||'').toLowerCase().includes(activeFilter.toLowerCase())); const body=document.getElementById('clerkBody'); if(!activeCoopId) body.innerHTML=`<tr><td colspan="4" class="p-6 text-center">Select a Cooperative</td></tr>`; else if(localStorage.getItem('nd_login_'+activeCoopId)!==coopMap[activeCoopId]?.password) body.innerHTML=`<tr><td colspan="4" class="p-6 text-center">🔒 Enter password</td></tr>`; else if(data.length===0) body.innerHTML=`<tr><td colspan="4" class="p-6 text-center text-gray-500">No ${activeFilter} milk for ${activeCoopCode}</td></tr>`; else body.innerHTML=data.map(r=>`<tr class="border-t"><td class="p-2.5">${r.batch_id}</td><td>${r.farmer_name}</td><td>${r.volume||r.litres}L</td><td>${r.quality}</td></tr>`).join(''); }
-async function saveDelivery(){ if(!activeCoopId) return alert('First select Cooperative'); if(localStorage.getItem('nd_login_'+activeCoopId)!==coopMap[activeCoopId]?.password) return alert('Enter password first'); const farmer=document.getElementById('farmer').value.trim(); const vol=Number(document.getElementById('volume').value); const fat=Number(document.getElementById('fat').value)||3.8; const quality=document.getElementById('quality').value; if(!farmer||!vol) return alert('Enter farmer and volume'); const batch=activeCoopCode+'-'+Math.floor(10000+Math.random()*89999); const {error}=await supa.from('deliveries').insert([{batch_id:batch, farmer_name:farmer, volume:vol, litres:vol, fat_percent:fat, fat:fat, quality:quality, cooperative_id:activeCoopId, coop_code:activeCoopCode}]); if(error) document.getElementById('msg').innerText=error.message; else {document.getElementById('msg').innerText='Saved '+batch+' to '+activeCoopCode; loadClerk();} }
-async function loadClerk(){ if(!activeCoopId) return; if(localStorage.getItem('nd_login_'+activeCoopId)!==coopMap[activeCoopId]?.password) return; const {data}=await supa.from('deliveries').select('*').eq('cooperative_id', activeCoopId).order('created_at',{ascending:false}).limit(200); allDeliveries=data||[]; let total=0, acc=0, ga=0, gb=0, rej=0; allDeliveries.forEach(r=>{const v=Number(r.volume||r.litres||0); total+=v; const q=(r.quality||'').toLowerCase(); if(q.includes('accepted')) acc+=v; else if(q.includes('grade a')) ga+=v; else if(q.includes('grade b')) gb+=v; else if(q.includes('reject')) rej+=v;}); document.getElementById('cTotal').innerText=total+' L'; document.getElementById('cAcc').innerText=acc+' L'; document.getElementById('cB').innerText=gb+' L'; document.getElementById('cRej').innerText=rej+' L'; document.getElementById('breakdown').innerHTML=`${activeCoopCode} — Accepted ${acc}L (${total?Math.round(acc/total*100):0}%)<br>Grade A ${ga}L<br>Grade B ${gb}L<br>Rejected ${rej}L`; document.getElementById('updated').innerText=new Date().toLocaleString('en-KE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); renderTable(); }
-async function init(){ let cfg; try{ const r=await fetch('/api/config'); cfg=await r.json(); }catch{ cfg={url:"https://hkhqbtyyqgvaktamilxs.supabase.co", anonKey:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhraHFidHl5cWd2YWt0YW1pbHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMTQwNDQsImV4cCI6MjEwNjU5MDA0NH0.gJcUf9XgzF34sczhD79V9oOnPD7a3XEU-5BXoQHWuAg"}; } supa=supabase.createClient(cfg.url,cfg.anonKey); await loadCoops(); }
+
+function applyFilter(f){ activeFilter=f; document.querySelectorAll('.filter-btn').forEach(b=>{ if(b.dataset.filter===f) b.className='filter-btn bg-[#0a7a42] text-white rounded-full px-5 py-2 text-[12px] font-bold whitespace-nowrap'; else b.className='filter-btn border rounded-full px-5 py-2 text-[12px] whitespace-nowrap bg-white'; }); renderTable(); }
+
+function renderTable(){
+  const body=document.getElementById('clerkBody');
+  if(!activeCoopId){ body.innerHTML=`<tr><td colspan="4" class="p-8 text-center">Select a Cooperative</td></tr>`; return; }
+  if(localStorage.getItem('nd_login_'+activeCoopId)!==coopMap[activeCoopId]?.password){ body.innerHTML=`<tr><td colspan="4" class="p-8 text-center text-gray-500">🔒 Enter password to view ${activeCoopCode} milk</td></tr>`; return; }
+
+  // STRICT ISOLATION: only show this co-op's milk
+  let filtered = allDeliveries.filter(r => {
+    return r.cooperative_id === activeCoopId || r.coop_code === activeCoopCode || (r.batch_id && r.batch_id.startsWith(activeCoopCode+'-'));
+  });
+
+  if(activeFilter!=='All Milk') filtered = filtered.filter(r=>(r.quality||'').toLowerCase().includes(activeFilter.toLowerCase()));
+
+  if(filtered.length===0){
+    body.innerHTML=`<tr><td colspan="4" class="p-10 text-center text-gray-500">No ${activeFilter} milk for <b>${activeCoopCode}</b><br><span class="text-[11px]">This co-op has no deliveries yet — Add first farmer above</span></td></tr>`;
+  } else {
+    body.innerHTML=filtered.map(r=>`<tr class="border-t"><td class="p-2.5 font-mono">${r.batch_id}</td><td>${r.farmer_name}</td><td>${r.volume||r.litres}L</td><td><span class="bg-[#eef2ee] px-2 py-0.5 rounded text-[11px]">${r.quality}</span></td></tr>`).join('');
+  }
+}
+
+async function saveDelivery(){
+  if(!activeCoopId) return alert('Select Co-op first');
+  if(localStorage.getItem('nd_login_'+activeCoopId)!==coopMap[activeCoopId]?.password) return alert('Enter password first');
+  const farmer=document.getElementById('farmer').value.trim();
+  const vol=Number(document.getElementById('volume').value);
+  const fat=Number(document.getElementById('fat').value)||3.8;
+  const quality=document.getElementById('quality').value;
+  if(!farmer||!vol) return alert('Enter farmer and volume');
+  const batch=activeCoopCode+'-'+Math.floor(10000+Math.random()*89999);
+  const {error}=await supa.from('deliveries').insert([{batch_id:batch, farmer_name:farmer, volume:vol, litres:vol, fat_percent:fat, fat:fat, quality, cooperative_id:activeCoopId, coop_code:activeCoopCode}]);
+  if(error) document.getElementById('msg').innerText=error.message; else { document.getElementById('msg').innerText='✅ Saved '+batch+' to '+activeCoopCode; document.getElementById('farmer').value=''; document.getElementById('volume').value=''; loadClerk(); }
+}
+
+async function loadClerk(){
+  if(!activeCoopId) return;
+  if(localStorage.getItem('nd_login_'+activeCoopId)!==coopMap[activeCoopId]?.password) return;
+  const {data, error}=await supa.from('deliveries').select('*').eq('cooperative_id', activeCoopId).order('created_at',{ascending:false}).limit(200);
+  if(error){ document.getElementById('clerkBody').innerHTML=`<tr><td colspan="4" class="p-6 text-center text-red-600">${error.message}</td></tr>`; return; }
+  
+  allDeliveries = data || [];
+
+  // Calculate totals only for this co-op
+  let total=0, acc=0, gb=0, rej=0;
+  allDeliveries.forEach(r=>{ const v=Number(r.volume||r.litres||0); total+=v; const q=(r.quality||'').toLowerCase(); if(q.includes('accepted')) acc+=v; else if(q.includes('grade b')) gb+=v; else if(q.includes('reject')) rej+=v; });
+
+  document.getElementById('cTotal').innerText=total+' L';
+  document.getElementById('cAcc').innerText=acc+' L';
+  document.getElementById('cB').innerText=gb+' L';
+  document.getElementById('cRej').innerText=rej+' L';
+  document.getElementById('updated').innerText=new Date().toLocaleString('en-KE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+  renderTable();
+}
+
+async function init(){
+  let cfg; try{ const r=await fetch('/api/config'); cfg=await r.json(); }catch{ cfg={url:"https://hkhqbtyyqgvaktamilxs.supabase.co", anonKey:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhraHFidHl5cWd2YWt0YW1pbHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMTQwNDQsImV4cCI6MjEwNjU5MDA0NH0.gJcUf9XgzF34sczhD79V9oOnPD7a3XEU-5BXoQHWuAg"}; }
+  supa=supabase.createClient(cfg.url,cfg.anonKey);
+  await loadCoops();
+}
 init();
 </script>
 </body>
