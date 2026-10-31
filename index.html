@@ -11,7 +11,11 @@
 <div class="bg-[#0a4d2e] text-white text-center text-[11px] py-1.5">🇰🇪 NATIONAL DAIRY Live — Password Required • Isolated Milk Links</div>
 <header class="bg-white border-b flex justify-between items-center px-4 py-3">
   <div class="font-bold text-[14px]">🇰🇪 National Dairy Cooperative - Kenya</div>
-  <div class="text-[12px] font-bold"><span onclick="showRegister()" class="cursor-pointer text-[#0a7a42] mr-3">+ Register</span> <span onclick="logoutCoop()" class="cursor-pointer">Logout</span></div>
+  <div class="text-[12px] font-bold">
+    <span onclick="showShiftSummary()" class="cursor-pointer text-[#0a4d2e] mr-3 font-bold bg-[#eef2ee] px-2.5 py-1 rounded">📊 Shift Summary</span>
+    <span onclick="showRegister()" class="cursor-pointer text-[#0a7a42] mr-3">+ Register</span> 
+    <span onclick="logoutCoop()" class="cursor-pointer text-red-600">Logout</span>
+  </div>
 </header>
 
 <div class="max-w-[1150px] w-[92%] mx-auto py-4">
@@ -38,6 +42,20 @@
     <p id="regMsg" class="text-[11px] mt-2"></p>
   </div>
 
+  <!-- Shift Summary Modal Box -->
+  <div id="shiftModal" class="hidden bg-[#eef2ee] border-2 border-[#0a4d2e] rounded-2xl p-4 mb-4 shadow-sm">
+    <div class="flex justify-between items-center mb-2">
+      <h3 class="font-bold text-[13px] text-[#0a4d2e]">📊 Daily Shift & Collection Tally</h3>
+      <button onclick="hideShiftSummary()" class="text-xs font-bold text-red-600 bg-white px-2 py-0.5 rounded border">✕ Close</button>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[12px] bg-white p-3 rounded-xl border">
+      <div>Total Batches: <b id="shiftBatches">0</b></div>
+      <div>Total Volume: <b id="shiftVol">0 L</b></div>
+      <div>Est. Payout (45 KES): <b id="shiftPayout" class="text-[#0a7a42]">KES 0</b></div>
+      <div>Active Co-op: <b id="shiftCoopName">None</b></div>
+    </div>
+  </div>
+
   <div id="loginOverlay" class="hidden bg-yellow-50 rounded-2xl border-2 border-[#0a4d2e] p-4 mb-4">
     <h3 class="font-bold text-[14px]" id="loginTitle">🔒 Password Required</h3>
     <p class="text-[11px] text-gray-600 mt-1">You must enter password to see milk for <b id="loginCoopName" class="text-[#0a4d2e]">this co-op</b>. Each co-op has its own separate link and password.</p>
@@ -47,7 +65,20 @@
 
   <div class="bg-white rounded-2xl border p-4 mb-4">
     <h3 class="font-bold text-[13px] mb-2">Add Delivery - Clerk <span id="coopLabel" class="text-[10px] bg-[#eef2ee] px-2 py-0.5 rounded ml-2">No Co-op</span></h3>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><input id="farmer" placeholder="Farmer Name" class="border rounded-xl p-2.5 text-[12px]"><input id="volume" type="number" placeholder="Volume (L)" class="border rounded-xl p-2.5 text-[12px]"><input id="fat" type="number" step="0.1" placeholder="Fat % 3.8" class="border rounded-xl p-2.5 text-[12px]"><select id="quality" class="border rounded-xl p-2.5 text-[12px]"><option>Accepted</option><option>Grade A</option><option>Grade B</option><option>Rejected</option></select></div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+      <div class="relative">
+        <input id="farmer" list="farmerList" placeholder="Farmer Name (Select or Type)" class="border rounded-xl p-2.5 text-[12px] w-full">
+        <datalist id="farmerList"></datalist>
+      </div>
+      <input id="volume" type="number" placeholder="Volume (L)" class="border rounded-xl p-2.5 text-[12px]">
+      <input id="fat" type="number" step="0.1" placeholder="Fat % 3.8" class="border rounded-xl p-2.5 text-[12px]">
+      <select id="quality" class="border rounded-xl p-2.5 text-[12px]">
+        <option>Accepted</option>
+        <option>Grade A</option>
+        <option>Grade B</option>
+        <option>Rejected</option>
+      </select>
+    </div>
     <button onclick="saveDelivery()" class="w-full bg-[#0a7a42] text-white rounded-xl py-2.5 mt-3 text-[12px] font-bold">Save to National Dairy Live</button>
     <p id="msg" class="text-[11px] mt-2"></p>
   </div>
@@ -64,6 +95,8 @@ let supa, allDeliveries=[], activeCoopId=null, activeCoopCode=null, coopMap={};
 function toggleEye(i,e){ const inp=document.getElementById(i); const eye=document.getElementById(e); if(inp.type==='password'){inp.type='text';eye.innerText='🙈';}else{inp.type='password';eye.innerText='👁️';} }
 function showRegister(){ document.getElementById('registerBox').classList.remove('hidden'); }
 function hideRegister(){ document.getElementById('registerBox').classList.add('hidden'); }
+function showShiftSummary(){ document.getElementById('shiftModal').classList.remove('hidden'); }
+function hideShiftSummary(){ document.getElementById('shiftModal').classList.add('hidden'); }
 function logoutCoop(){ if(activeCoopId) localStorage.removeItem('nd_login_'+activeCoopId); localStorage.removeItem('nd_coop_id'); history.replaceState(null,'','?'); location.reload(); }
 
 function getCoopFilterFromUrl(){
@@ -181,7 +214,6 @@ async function loadCoops(){
   const sel=document.getElementById('coopSelect');
   sel.innerHTML='<option value="">Select Cooperative...</option>' + activeOnly.map(c=>`<option value="${c.id}">${c.code} - ${c.name} ${!c.password?'🆕 NO PASS':''}</option>`).join('');
   
-  // Check URL query param first (?coop=githunguri), then localStorage
   const urlFilter = getCoopFilterFromUrl();
   let targetCoop = null;
   if(urlFilter){
@@ -210,6 +242,11 @@ function renderTable(){
   } else {
     body.innerHTML=allDeliveries.map(r=>`<tr class="border-t"><td class="p-2.5 font-mono text-[11px]">${r.batch_id}</td><td>${r.farmer_name}</td><td>${r.volume||r.litres}L</td><td>${r.quality}</td></tr>`).join('');
   }
+
+  // Populate Farmer Directory Datalist for Quick Selection
+  const uniqueFarmers = [...new Set(allDeliveries.map(r => r.farmer_name).filter(Boolean))];
+  const dList = document.getElementById('farmerList');
+  dList.innerHTML = uniqueFarmers.map(name => `<option value="${name}">`).join('');
 }
 
 async function saveDelivery(){
@@ -236,6 +273,13 @@ async function loadClerk(){
   let total=0, acc=0, gb=0, rej=0;
   allDeliveries.forEach(r=>{ const v=Number(r.volume||r.litres||0); total+=v; const q=(r.quality||'').toLowerCase(); if(q.includes('accepted')) acc+=v; else if(q.includes('grade b')) gb+=v; else if(q.includes('reject')) rej+=v; });
   document.getElementById('cTotal').innerText=total+' L'; document.getElementById('cAcc').innerText=acc+' L'; document.getElementById('cB').innerText=gb+' L'; document.getElementById('cRej').innerText=rej+' L';
+  
+  // Update Shift Summary values
+  document.getElementById('shiftBatches').innerText = allDeliveries.length;
+  document.getElementById('shiftVol').innerText = total + ' L';
+  document.getElementById('shiftPayout').innerText = 'KES ' + (total * 45).toLocaleString();
+  document.getElementById('shiftCoopName').innerText = coopMap[activeCoopId]?.name || activeCoopCode;
+
   renderTable();
 }
 
