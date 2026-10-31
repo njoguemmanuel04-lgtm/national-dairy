@@ -78,7 +78,7 @@ body{font-family:DM Sans,sans-serif;background:#f6f9f6}
     <h3 class="font-bold text-sm">Cooperatives Control</h3>
     <button onclick="loadCoopsAdmin()" class="text-[10px] text-gray-500 underline">Refresh Co-ops</button>
   </div>
-  <div id="coopList" class="mt-2 text-[12px] space-y-2 max-h-[300px] overflow-y-auto"></div>
+  <div id="coopList" class="mt-2 text-[12px] space-y-3 max-h-[350px] overflow-y-auto"></div>
 </div>
 </div>
 </div>
@@ -192,19 +192,56 @@ async function loadCoopsAdmin(){
     filterSel.innerHTML = '<option value="ALL">All Cooperatives (National View)</option>' + 
       data.map(c => `<option value="${c.id}">${c.code} - ${c.name}</option>`).join('');
 
-    // Populate Side List
-    document.getElementById('coopList').innerHTML = data.map(c => `
-      <div class="flex justify-between items-center border-b py-2 text-[11px]">
-        <div>
-          <b>${c.code}</b> — ${c.name}<br>
-          <span class="text-gray-500">Pass: ${c.password ? '🔑 ' + c.password : '⚠️ None'}</span>
+    // Populate Side List with View/Reset Password & Deactivate controls
+    document.getElementById('coopList').innerHTML = data.map(c => {
+      const isActive = c.is_active !== false;
+      return `
+      <div class="border rounded-xl p-2.5 bg-gray-50 flex flex-col gap-1.5 text-[11px]">
+        <div class="flex justify-between items-center">
+          <div>
+            <b class="text-[#064c32] text-[12px]">${c.code}</b> — ${c.name}
+          </div>
+          <button onclick="toggleCoopStatus('${c.id}', ${isActive})" class="px-2 py-0.5 rounded text-[10px] font-bold ${isActive ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-red-100 text-red-700 border border-red-300'}">
+            ${isActive ? '🟢 Active' : '🔴 Deactivated'}
+          </button>
         </div>
-        <button onclick="toggleCoopStatus('${c.id}', ${c.is_active !== false})" class="px-2 py-1 rounded text-[10px] font-bold ${c.is_active !== false ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
-          ${c.is_active !== false ? 'Active' : 'Blocked'}
-        </button>
+        
+        <div class="flex justify-between items-center bg-white p-1.5 border rounded-lg">
+          <span class="text-gray-600 font-mono">Pass: <b id="passDisplay_${c.id}">••••••</b></span>
+          <div class="flex gap-1">
+            <button onclick="togglePassView('${c.id}', '${c.password || ''}')" class="bg-gray-100 hover:bg-gray-200 border rounded px-2 py-0.5 text-[10px]">👁️ Show</button>
+            <button onclick="resetCoopPass('${c.id}', '${c.code}')" class="bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded px-2 py-0.5 text-[10px] font-bold">✏️ Reset</button>
+          </div>
+        </div>
       </div>
-    `).join('');
+      `;
+    }).join('');
   }catch(e){}
+}
+
+function togglePassView(id, actualPass){
+  const el = document.getElementById(`passDisplay_${id}`);
+  if(!el) return;
+  if(el.innerText === '••••••'){
+    el.innerText = actualPass || 'NO PASS';
+  } else {
+    el.innerText = '••••••';
+  }
+}
+
+async function resetCoopPass(id, coopCode){
+  const newPass = prompt(`Enter NEW password for ${coopCode}:`);
+  if(!newPass) return;
+  if(newPass.trim().length < 4){
+    alert('Password must be at least 4 characters');
+    return;
+  }
+  const {error} = await supa.from('cooperatives').update({password: newPass.trim()}).eq('id', id);
+  if(error) alert(error.message);
+  else {
+    alert(`✅ Password for ${coopCode} updated to: ${newPass.trim()}`);
+    loadCoopsAdmin();
+  }
 }
 
 async function toggleCoopStatus(id, currentActive){
