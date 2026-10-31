@@ -75,10 +75,10 @@ body{font-family:DM Sans,sans-serif;background:#f6f9f6}
 <!-- Cooperative Management Card -->
 <div class="card">
   <div class="flex justify-between items-center mb-2">
-    <h3 class="font-bold text-sm">Cooperatives Control</h3>
+    <h3 class="font-bold text-sm">Cooperatives Access Control</h3>
     <button onclick="loadCoopsAdmin()" class="text-[10px] text-gray-500 underline">Refresh Co-ops</button>
   </div>
-  <div id="coopList" class="mt-2 text-[12px] space-y-3 max-h-[350px] overflow-y-auto"></div>
+  <div id="coopList" class="mt-2 text-[12px] space-y-3 max-h-[400px] overflow-y-auto"></div>
 </div>
 </div>
 </div>
@@ -183,55 +183,65 @@ async function editRow(id){
 
 async function loadCoopsAdmin(){
   try{
-    const {data} = await supa.from('cooperatives').select('*').order('name');
-    if(!data) return;
+    const {data, error} = await supa.from('cooperatives').select('*').order('name');
+    if(error){
+      document.getElementById('coopList').innerHTML = `<div class="p-2 text-red-600 text-[11px]">Error loading co-ops: ${error.message}</div>`;
+      return;
+    }
+    if(!data || !data.length){
+      document.getElementById('coopList').innerHTML = `<div class="p-2 text-gray-500 text-[11px]">No cooperatives found</div>`;
+      return;
+    }
     coopsData = data;
     
     // Populate filter dropdown
     const filterSel = document.getElementById('adminCoopFilter');
     filterSel.innerHTML = '<option value="ALL">All Cooperatives (National View)</option>' + 
-      data.map(c => `<option value="${c.id}">${c.code} - ${c.name}</option>`).join('');
+      data.map(c => `<option value="${c.id}">${c.code || c.id} - ${c.name}</option>`).join('');
 
-    // Populate Side List with View/Reset Password & Deactivate controls
+    // Render Co-op cards with Deactivate & Password Controls
     document.getElementById('coopList').innerHTML = data.map(c => {
       const isActive = c.is_active !== false;
+      const pass = c.password ? c.password : '';
       return `
-      <div class="border rounded-xl p-2.5 bg-gray-50 flex flex-col gap-1.5 text-[11px]">
+      <div class="border rounded-xl p-3 bg-gray-50 flex flex-col gap-2 text-[11px]">
         <div class="flex justify-between items-center">
           <div>
-            <b class="text-[#064c32] text-[12px]">${c.code}</b> — ${c.name}
+            <b class="text-[#064c32] text-[12px]">${c.code || c.id}</b> — ${c.name}
           </div>
-          <button onclick="toggleCoopStatus('${c.id}', ${isActive})" class="px-2 py-0.5 rounded text-[10px] font-bold ${isActive ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-red-100 text-red-700 border border-red-300'}">
+          <button onclick="toggleCoopStatus('${c.id}', ${isActive})" class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${isActive ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-red-100 text-red-700 border border-red-300'}">
             ${isActive ? '🟢 Active' : '🔴 Deactivated'}
           </button>
         </div>
         
-        <div class="flex justify-between items-center bg-white p-1.5 border rounded-lg">
-          <span class="text-gray-600 font-mono">Pass: <b id="passDisplay_${c.id}">••••••</b></span>
-          <div class="flex gap-1">
-            <button onclick="togglePassView('${c.id}', '${c.password || ''}')" class="bg-gray-100 hover:bg-gray-200 border rounded px-2 py-0.5 text-[10px]">👁️ Show</button>
-            <button onclick="resetCoopPass('${c.id}', '${c.code}')" class="bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded px-2 py-0.5 text-[10px] font-bold">✏️ Reset</button>
+        <div class="flex justify-between items-center bg-white p-2 border rounded-lg">
+          <span class="text-gray-600 font-mono">Pass: <b id="passDisplay_${c.id}">${pass ? '••••••' : '<span class="text-amber-600">No Pass</span>'}</b></span>
+          <div class="flex gap-1.5">
+            <button onclick="togglePassView('${c.id}', '${pass}')" class="bg-gray-100 hover:bg-gray-200 border rounded px-2 py-0.5 text-[10px] font-bold">👁️ View</button>
+            <button onclick="resetCoopPass('${c.id}', '${c.code || c.name}')" class="bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded px-2 py-0.5 text-[10px] font-bold">✏️ Reset</button>
           </div>
         </div>
       </div>
       `;
     }).join('');
-  }catch(e){}
+  }catch(e){
+    document.getElementById('coopList').innerHTML = `<div class="p-2 text-red-600 text-[11px]">Error: ${e.message}</div>`;
+  }
 }
 
 function togglePassView(id, actualPass){
   const el = document.getElementById(`passDisplay_${id}`);
   if(!el) return;
-  if(el.innerText === '••••••'){
+  if(el.innerText === '••••••' || el.innerText.includes('No Pass')){
     el.innerText = actualPass || 'NO PASS';
   } else {
-    el.innerText = '••••••';
+    el.innerText = actualPass ? '••••••' : 'No Pass';
   }
 }
 
 async function resetCoopPass(id, coopCode){
   const newPass = prompt(`Enter NEW password for ${coopCode}:`);
-  if(!newPass) return;
+  if(newPass === null) return;
   if(newPass.trim().length < 4){
     alert('Password must be at least 4 characters');
     return;
