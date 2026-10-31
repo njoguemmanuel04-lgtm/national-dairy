@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>National Dairy Admin | Kenya - Live</title>
+<title>National Dairy Admin | Kenya - Live Control Center</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
@@ -13,54 +13,243 @@ body{font-family:DM Sans,sans-serif;background:#f6f9f6}
 </style>
 </head>
 <body>
-<div class="bg-[#064c32] text-white text-center p-2 text-[11px]">🇰🇪 National Dairy Admin — 23 Co-ops Live • <span id="topTotal">Live</span> Today • M-Pesa Ready • Kenya Dairy Board</div>
-<header class="bg-white border-b p-4 flex justify-between items-center"><b>🇰🇪 National Dairy Admin — Kenya</b><a href="index.html" class="text-xs border rounded-full px-3 py-1">View Clerk Page</a></header>
+<div class="bg-[#064c32] text-white text-center p-2 text-[11px]">🇰🇪 National Dairy Admin — Control Center Live • <span id="topTotal">Live</span> Today • M-Pesa Ready • Kenya Dairy Board</div>
+<header class="bg-white border-b p-4 flex justify-between items-center">
+  <b>🇰🇪 National Dairy Admin — Kenya</b>
+  <div class="flex gap-2">
+    <button onclick="exportToCSV()" class="text-xs bg-[#e9ecea] border rounded-full px-3 py-1 font-bold">📥 Export CSV</button>
+    <a href="index.html" class="text-xs border rounded-full px-3 py-1 bg-[#064c32] text-white font-bold">View Clerk Page</a>
+  </div>
+</header>
+
 <div class="max-w-[1160px] w-[92%] mx-auto py-4">
+
+<!-- Cooperative Filter Bar -->
+<div class="card mb-4 flex flex-col md:flex-row gap-3 items-center justify-between bg-[#f0f9f0]">
+  <div class="flex items-center gap-2">
+    <span class="text-xs font-bold text-[#064c32]">🏢 Filter by Co-op:</span>
+    <select id="adminCoopFilter" onchange="filterAdminTable()" class="border rounded-xl p-2 text-xs font-bold bg-white min-w-[200px]">
+      <option value="ALL">All Cooperatives (National View)</option>
+    </select>
+  </div>
+  <div class="text-xs text-gray-600 font-bold">
+    Active View: <span id="currentViewLabel" class="text-[#064c32]">All Cooperatives</span>
+  </div>
+</div>
+
 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-<div class="card text-center"><small class="text-[11px]">Total Collections Today</small><b id="aTotal" class="block text-[22px]">0 L</b><small class="text-green-600 text-[11px]">Live National Dairy</small></div>
+<div class="card text-center"><small class="text-[11px]">Total Collections</small><b id="aTotal" class="block text-[22px]">0 L</b><small class="text-green-600 text-[11px]">Live National Dairy</small></div>
 <div class="card text-center"><small class="text-[11px]">Accepted Milk</small><b id="aAcc" class="block text-[22px]">0 L</b><small id="aAccP" class="text-[11px]">0%</small></div>
 <div class="card text-center"><small class="text-[11px]">Grade B Milk</small><b id="aB" class="block text-[22px]">0 L</b><small id="aBP" class="text-[11px] text-[#a16207]">0%</small></div>
 <div class="card text-center"><small class="text-[11px]">Rejected Milk</small><b id="aRej" class="block text-[22px]">0 L</b><small id="aRejP" class="text-[11px] text-red-600">0%</small></div>
 </div>
+
 <div class="grid md:grid-cols-[2fr_1fr] gap-4 mt-4">
 <div class="card">
-<div class="flex justify-between items-center mb-3"><h3 class="font-bold text-sm">All Deliveries — Edit/Delete Live - National Dairy</h3><button onclick="loadAdmin()" class="text-xs border rounded-full px-3 py-1">Refresh</button></div>
+<div class="flex justify-between items-center mb-3">
+  <h3 class="font-bold text-sm">All Deliveries — Edit/Delete Live - National Dairy</h3>
+  <button onclick="loadAdmin()" class="text-xs border rounded-full px-3 py-1">Refresh</button>
+</div>
 <div class="overflow-auto">
-<table class="w-full text-[12px] min-w-[700px]"><thead><tr class="bg-[#e9ecea]"><th class="p-2 text-left">Batch</th><th class="text-left">Farmer</th><th>Vol</th><th>Fat%</th><th>Quality</th><th>Action</th></tr></thead><tbody id="adminBody"><tr><td colspan="6" class="p-6 text-center">Loading live from National Dairy...</td></tr></tbody></table>
+<table class="w-full text-[12px] min-w-[700px]"><thead><tr class="bg-[#e9ecea]"><th class="p-2 text-left">Co-op</th><th class="p-2 text-left">Batch</th><th class="text-left">Farmer</th><th>Vol</th><th>Fat%</th><th>Quality</th><th>Action</th></tr></thead><tbody id="adminBody"><tr><td colspan="7" class="p-6 text-center">Loading live from National Dairy...</td></tr></tbody></table>
 </div>
 <div class="mt-3 p-2 bg-[#f0f9f0] text-[11px]">Note: Kenya Dairy Board — Accepted, Grade A, Grade B, Rejected only. No A+ grade.</div>
 </div>
+
 <div class="space-y-4">
-<div class="card"><h3 class="font-bold text-sm">💰 M-Pesa Payout - National Dairy</h3><p class="text-[11px] text-gray-500 mt-1">KES 45 per litre • Auto calc from live total</p><div class="mt-3 text-[12px]"><div>Total Payable: <b id="payTotal">KES 0</b></div><div class="text-[11px] text-gray-500">Farmers: <span id="payCount">0</span></div></div><button onclick="processPayout()" class="w-full bg-[#087747] text-white rounded-xl p-3 mt-3 font-bold text-xs">Process M-Pesa Payout Now</button><p id="payMsg" class="text-[11px] text-green-700 mt-2"></p></div>
-<div class="card"><h3 class="font-bold text-sm">Cooperatives - National Dairy</h3><div id="coopList" class="mt-2 text-[12px] space-y-2"></div></div>
+<!-- Dynamic Rate Payout Card -->
+<div class="card">
+  <h3 class="font-bold text-sm">💰 M-Pesa Payout - National Dairy</h3>
+  <div class="mt-2 flex items-center justify-between text-[11px]">
+    <span>Rate per Litre (KES):</span>
+    <input id="payoutRate" type="number" value="45" oninput="recalculatePayout()" class="border rounded-lg p-1 w-20 text-right font-bold">
+  </div>
+  <div class="mt-3 text-[12px]">
+    <div>Total Payable: <b id="payTotal" class="text-[#087747]">KES 0</b></div>
+    <div class="text-[11px] text-gray-500">Deliveries Count: <span id="payCount">0</span></div>
+  </div>
+  <button onclick="processPayout()" class="w-full bg-[#087747] text-white rounded-xl p-3 mt-3 font-bold text-xs hover:bg-[#064c32]">Process M-Pesa Bulk Payout</button>
+  <p id="payMsg" class="text-[11px] text-green-700 mt-2 font-bold"></p>
+</div>
+
+<!-- Cooperative Management Card -->
+<div class="card">
+  <div class="flex justify-between items-center mb-2">
+    <h3 class="font-bold text-sm">Cooperatives Control</h3>
+    <button onclick="loadCoopsAdmin()" class="text-[10px] text-gray-500 underline">Refresh Co-ops</button>
+  </div>
+  <div id="coopList" class="mt-2 text-[12px] space-y-2 max-h-[300px] overflow-y-auto"></div>
 </div>
 </div>
 </div>
+</div>
+
 <script>
-let supa; let adminData=[];
+let supa; let adminData=[]; let coopsData=[];
 function badge(q){ q=(q||'').toLowerCase(); if(q.includes('accept')) return `<span class="badge badge-accepted">Accepted</span>`; if(q.includes('grade a')) return `<span class="badge badge-a">Grade A</span>`; if(q.includes('grade b')) return `<span class="badge badge-b">Grade B</span>`; return `<span class="badge badge-rejected">Rejected</span>`; }
+
 async function loadAdmin(){
   try{
-    const { data, error } = await supa.from('deliveries').select('*').order('created_at',{ascending:false}).limit(200);
+    const { data, error } = await supa.from('deliveries').select('*').order('created_at',{ascending:false}).limit(300);
     if(error) throw error;
     adminData=data||[];
-    const tbody=document.getElementById('adminBody');
-    if(adminData.length===0){ tbody.innerHTML=`<tr><td colspan=6 class="p-4 text-center">No deliveries yet — save from clerk page</td></tr>`; updateStats({total:0,acc:0,b:0,rej:0}); return; }
-    let total=0, acc=0, b=0, rej=0;
-    adminData.forEach(r=>{ const vol=Number(r.volume ?? r.litres ?? 0); total+=vol; const q=(r.quality||'').toLowerCase(); if(q.includes('accept')) acc+=vol; else if(q.includes('grade b')) b+=vol; else if(q.includes('reject')) rej+=vol; });
-    tbody.innerHTML=adminData.map(r=>{
-      const vol=Number(r.volume ?? r.litres ?? 0); const farmer=r.farmer_name || r.farmer || 'Unknown'; const batch=r.batch_id || (r.id||'').slice(0,8) || 'BD-'; const fat=r.fat_percent ?? r.fat ?? 3.5;
-      return `<tr class="border-t"><td class="p-2">${batch}</td><td class="p-2">${farmer}</td><td class="p-2">${vol}L</td><td class="p-2">${Number(fat).toFixed(1)}%</td><td class="p-2">${badge(r.quality)}</td><td class="p-2 flex gap-1"><button onclick="editRow('${r.id}')" class="border rounded-full px-2 py-1 text-[11px]">Edit</button><button onclick="deleteRow('${r.id}')" class="bg-red-600 text-white rounded-full px-2 py-1 text-[11px]">Delete</button></td></tr>`;
-    }).join('');
-    updateStats({total,acc,b,rej,count:adminData.length});
-  }catch(e){ document.getElementById('adminBody').innerHTML=`<tr><td colspan=6 class="p-4 text-red-600">Error: ${e.message}<br>Run: alter table deliveries disable row level security;</td></tr>`; }
+    filterAdminTable();
+  }catch(e){ 
+    document.getElementById('adminBody').innerHTML=`<tr><td colspan=7 class="p-4 text-red-600">Error: ${e.message}<br>Run: alter table deliveries disable row level security;</td></tr>`; 
+  }
 }
-function updateStats({total=0,acc=0,b=0,rej=0,count=0}={}){ document.getElementById('aTotal').innerText=total+" L"; document.getElementById('topTotal').innerText=total+"L"; document.getElementById('aAcc').innerText=acc+" L"; document.getElementById('aB').innerText=b+" L"; document.getElementById('aRej').innerText=rej+" L"; document.getElementById('aAccP').innerText=(total?Math.round(acc/total*100):0)+"% of total"; document.getElementById('aBP').innerText=(total?Math.round(b/total*100):0)+"%"; document.getElementById('aRejP').innerText=(total?Math.round(rej/total*100):0)+"%"; document.getElementById('payTotal').innerText="KES "+(total*45).toLocaleString(); document.getElementById('payCount').innerText=count; }
-async function deleteRow(id){ if(!confirm('Delete from National Dairy?'))return; const {error}=await supa.from('deliveries').delete().eq('id',id); if(error) alert(error.message); else loadAdmin(); }
-async function editRow(id){ const row=adminData.find(r=>r.id===id); const newVol=prompt(`Edit volume for ${row.farmer_name||row.farmer} (current ${row.volume||row.litres}L):`, row.volume??row.litres); if(newVol===null) return; const newQuality=prompt(`Edit quality (Accepted, Grade A, Grade B, Rejected):`, row.quality); if(newQuality===null) return; const {error}=await supa.from('deliveries').update({ volume:Number(newVol), quality:newQuality }).eq('id',id); if(error) alert(error.message); else loadAdmin(); }
-async function loadCoopsAdmin(){ try{ const {data}=await supa.from('cooperatives').select('*'); if(!data) return; document.getElementById('coopList').innerHTML=data.map(c=>`<div class="flex justify-between border-b py-1"><span>${c.name}</span><b>${c.farmers||''}</b></div>`).join(''); }catch(e){} }
-function processPayout(){ document.getElementById('payMsg').innerText="Processing M-Pesa for "+document.getElementById('aTotal').innerText+" = "+document.getElementById('payTotal').innerText+" - National Dairy"; }
-async function initSupabase(){ let cfg; try{ const res=await fetch('/api/config'); cfg=await res.json(); if(!cfg.url||!cfg.anonKey) throw 0; }catch{ cfg={url:"https://hkhqbtyyqgvaktamilxs.supabase.co", anonKey:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhraHFidHl5cWd2YWt0YW1pbHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMTQwNDQsImV4cCI6MjEwNjU5MDA0NH0.gJcUf9XgzF34sczhD79V9oOnPD7a3XEU-5BXoQHWuAg"}; } supa=supabase.createClient(cfg.url,cfg.anonKey); loadAdmin(); supa.channel('national-dairy-live').on('postgres_changes',{event:'*',schema:'public',table:'deliveries'},()=>loadAdmin()).subscribe(); loadCoopsAdmin(); }
+
+function filterAdminTable(){
+  const filterVal = document.getElementById('adminCoopFilter').value;
+  let filtered = adminData;
+  if(filterVal !== 'ALL'){
+    filtered = adminData.filter(r => (r.cooperative_id || '').toLowerCase() === filterVal.toLowerCase() || (r.coop_code || '').toLowerCase() === filterVal.toLowerCase());
+  }
+  
+  const tbody = document.getElementById('adminBody');
+  if(filtered.length === 0){
+    tbody.innerHTML = `<tr><td colspan=7 class="p-4 text-center text-gray-500">No deliveries found for selected view</td></tr>`;
+    updateStats({total:0,acc:0,b:0,rej:0,count:0});
+    return;
+  }
+
+  let total=0, acc=0, b=0, rej=0;
+  filtered.forEach(r => {
+    const vol = Number(r.volume ?? r.litres ?? 0);
+    total += vol;
+    const q = (r.quality||'').toLowerCase();
+    if(q.includes('accept')) acc += vol;
+    else if(q.includes('grade b')) b += vol;
+    else if(q.includes('reject')) rej += vol;
+  });
+
+  tbody.innerHTML = filtered.map(r => {
+    const vol = Number(r.volume ?? r.litres ?? 0);
+    const farmer = r.farmer_name || r.farmer || 'Unknown';
+    const batch = r.batch_id || (r.id||'').slice(0,8) || 'BD-';
+    const fat = r.fat_percent ?? r.fat ?? 3.5;
+    const coop = r.coop_code || r.cooperative_id || 'GENERAL';
+    return `<tr class="border-t">
+      <td class="p-2 font-bold text-[#064c32]">${coop}</td>
+      <td class="p-2 font-mono text-[11px]">${batch}</td>
+      <td class="p-2">${farmer}</td>
+      <td class="p-2 font-bold">${vol}L</td>
+      <td class="p-2">${Number(fat).toFixed(1)}%</td>
+      <td class="p-2">${badge(r.quality)}</td>
+      <td class="p-2 flex gap-1">
+        <button onclick="editRow('${r.id}')" class="border rounded-full px-2 py-1 text-[11px]">Edit</button>
+        <button onclick="deleteRow('${r.id}')" class="bg-red-600 text-white rounded-full px-2 py-1 text-[11px]">Delete</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  updateStats({total, acc, b, rej, count: filtered.length});
+}
+
+function recalculatePayout(){
+  const totalL = parseFloat(document.getElementById('aTotal').innerText) || 0;
+  const rate = parseFloat(document.getElementById('payoutRate').value) || 0;
+  document.getElementById('payTotal').innerText = "KES " + (totalL * rate).toLocaleString();
+}
+
+function updateStats({total=0,acc=0,b=0,rej=0,count=0}={}){
+  document.getElementById('aTotal').innerText = total + " L";
+  document.getElementById('topTotal').innerText = total + "L";
+  document.getElementById('aAcc').innerText = acc + " L";
+  document.getElementById('aB').innerText = b + " L";
+  document.getElementById('aRej').innerText = rej + " L";
+  document.getElementById('aAccP').innerText = (total ? Math.round(acc/total*100) : 0) + "% of total";
+  document.getElementById('aBP').innerText = (total ? Math.round(b/total*100) : 0) + "%";
+  document.getElementById('aRejP').innerText = (total ? Math.round(rej/total*100) : 0) + "%";
+  document.getElementById('payCount').innerText = count;
+  recalculatePayout();
+}
+
+async function deleteRow(id){
+  if(!confirm('Delete this delivery record from National Dairy?')) return;
+  const {error} = await supa.from('deliveries').delete().eq('id',id);
+  if(error) alert(error.message); else loadAdmin();
+}
+
+async function editRow(id){
+  const row = adminData.find(r => r.id === id);
+  const newVol = prompt(`Edit volume for ${row.farmer_name||row.farmer} (current ${row.volume||row.litres}L):`, row.volume??row.litres);
+  if(newVol === null) return;
+  const newQuality = prompt(`Edit quality (Accepted, Grade A, Grade B, Rejected):`, row.quality);
+  if(newQuality === null) return;
+  const {error} = await supa.from('deliveries').update({ volume: Number(newVol), quality: newQuality }).eq('id',id);
+  if(error) alert(error.message); else loadAdmin();
+}
+
+async function loadCoopsAdmin(){
+  try{
+    const {data} = await supa.from('cooperatives').select('*').order('name');
+    if(!data) return;
+    coopsData = data;
+    
+    // Populate filter dropdown
+    const filterSel = document.getElementById('adminCoopFilter');
+    filterSel.innerHTML = '<option value="ALL">All Cooperatives (National View)</option>' + 
+      data.map(c => `<option value="${c.id}">${c.code} - ${c.name}</option>`).join('');
+
+    // Populate Side List
+    document.getElementById('coopList').innerHTML = data.map(c => `
+      <div class="flex justify-between items-center border-b py-2 text-[11px]">
+        <div>
+          <b>${c.code}</b> — ${c.name}<br>
+          <span class="text-gray-500">Pass: ${c.password ? '🔑 ' + c.password : '⚠️ None'}</span>
+        </div>
+        <button onclick="toggleCoopStatus('${c.id}', ${c.is_active !== false})" class="px-2 py-1 rounded text-[10px] font-bold ${c.is_active !== false ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+          ${c.is_active !== false ? 'Active' : 'Blocked'}
+        </button>
+      </div>
+    `).join('');
+  }catch(e){}
+}
+
+async function toggleCoopStatus(id, currentActive){
+  const newStatus = !currentActive;
+  const {error} = await supa.from('cooperatives').update({is_active: newStatus}).eq('id', id);
+  if(error) alert(error.message); else loadCoopsAdmin();
+}
+
+function processPayout(){
+  const totalL = document.getElementById('aTotal').innerText;
+  const payable = document.getElementById('payTotal').innerText;
+  document.getElementById('payMsg').innerText = `✅ M-Pesa Bulk Request initiated for ${totalL} = ${payable}!`;
+}
+
+function exportToCSV(){
+  if(!adminData.length) return alert('No delivery data to export');
+  let csv = 'Batch ID,Cooperative,Farmer Name,Volume (L),Fat %,Quality,Date\n';
+  adminData.forEach(r => {
+    csv += `"${r.batch_id||''}","${r.coop_code||''}","${r.farmer_name||''}","${r.volume||0}","${r.fat_percent||3.5}","${r.quality||''}","${r.created_at||''}"\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.setAttribute('href', url);
+  a.setAttribute('download', `National_Dairy_Report_${new Date().toISOString().slice(0,10)}.csv`);
+  a.click();
+}
+
+async function initSupabase(){
+  let cfg; 
+  try{ 
+    const res = await fetch('/api/config'); 
+    cfg = await res.json(); 
+    if(!cfg.url||!cfg.anonKey) throw 0; 
+  }catch{ 
+    cfg = {
+      url: "https://hkhqbtyyqgvaktamilxs.supabase.co", 
+      anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhraHFidHl5cWd2YWt0YW1pbHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMTQwNDQsImV4cCI6MjEwNjU5MDA0NH0.gJcUf9XgzF34sczhD79V9oOnPD7a3XEU-5BXoQHWuAg"
+    }; 
+  } 
+  supa = supabase.createClient(cfg.url, cfg.anonKey); 
+  await loadCoopsAdmin();
+  await loadAdmin(); 
+  supa.channel('national-dairy-live').on('postgres_changes', {event:'*', schema:'public', table:'deliveries'}, () => loadAdmin()).subscribe(); 
+}
 initSupabase();
 </script>
 </body>
