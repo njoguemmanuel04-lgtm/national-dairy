@@ -140,7 +140,19 @@ function switchCoop(fromUrl=false){
   }
   const coop=coopMap[sel.value];
   if(!coop) return;
-  if(coop.is_active===false){ alert('Deactivated by admin'); sel.value=''; return; }
+  
+  // FIXED: Check if cooperative is blocked/deactivated
+  if(coop.is_active === false){ 
+    alert('❌ Access Denied: This cooperative has been deactivated by the Admin.'); 
+    sel.value=''; 
+    overlay.classList.add('hidden');
+    body.innerHTML=`<tr><td colspan="4" class="p-8 text-center text-red-600 font-bold">❌ Cooperative Deactivated by Admin</td></tr>`;
+    document.getElementById('activeCoopName').innerText='Deactivated'; 
+    document.getElementById('coopCode').innerText=''; 
+    document.getElementById('coopLabel').innerText='Blocked'; 
+    document.getElementById('headerCoop').innerText='Blocked';
+    return; 
+  }
 
   // Update browser URL so each coop has its separate link
   history.replaceState(null, '', '?coop=' + coop.code.toLowerCase());
@@ -190,6 +202,12 @@ async function loginCoop(){
   if(!entered) return msg.innerText='Enter password!';
   const coop=coopMap[activeCoopId];
   
+  if(coop && coop.is_active === false){
+    alert('❌ Access Denied: This cooperative has been deactivated by the Admin.');
+    location.reload();
+    return;
+  }
+
   if(!coop.password || coop.password.trim()===''){
     const {error}=await supa.from('cooperatives').update({password:entered}).eq('id', activeCoopId);
     if(error) return msg.innerText=error.message;
@@ -210,6 +228,8 @@ async function loginCoop(){
 async function loadCoops(){
   const {data}=await supa.from('cooperatives').select('*').order('name');
   if(!data) return; coopMap={}; data.forEach(c=> coopMap[c.id]=c);
+  
+  // FIXED: Only load active cooperatives into the dropdown
   const activeOnly=data.filter(c=> c.is_active!==false);
   const sel=document.getElementById('coopSelect');
   sel.innerHTML='<option value="">Select Cooperative...</option>' + activeOnly.map(c=>`<option value="${c.id}">${c.code} - ${c.name} ${!c.password?'🆕 NO PASS':''}</option>`).join('');
@@ -217,16 +237,21 @@ async function loadCoops(){
   const urlFilter = getCoopFilterFromUrl();
   let targetCoop = null;
   if(urlFilter){
-    targetCoop = activeOnly.find(c => c.code.toLowerCase() === urlFilter || c.id.toLowerCase() === urlFilter);
+    targetCoop = data.find(c => (c.code.toLowerCase() === urlFilter || c.id.toLowerCase() === urlFilter));
   }
   if(!targetCoop){
     const saved = localStorage.getItem('nd_coop_id');
-    if(saved && coopMap[saved] && coopMap[saved].is_active!==false){
+    if(saved && coopMap[saved]){
       targetCoop = coopMap[saved];
     }
   }
 
   if(targetCoop){
+    if(targetCoop.is_active === false){
+      alert('⚠️ The cooperative linked by URL or session has been deactivated by the admin.');
+      localStorage.removeItem('nd_coop_id');
+      return;
+    }
     sel.value = targetCoop.id;
     switchCoop(true);
   }
@@ -235,6 +260,10 @@ async function loadCoops(){
 function renderTable(){
   const body=document.getElementById('clerkBody');
   if(!activeCoopId) return;
+  if(coopMap[activeCoopId]?.is_active === false){
+    body.innerHTML=`<tr><td colspan="4" class="p-8 text-center text-red-600 font-bold">❌ Cooperative Deactivated</td></tr>`;
+    return;
+  }
   if(localStorage.getItem('nd_login_'+activeCoopId)!==coopMap[activeCoopId]?.password){ body.innerHTML=`<tr><td colspan="4" class="p-8 text-center">🔒 Enter password</td></tr>`; return; }
   
   if(allDeliveries.length===0){
@@ -251,6 +280,11 @@ function renderTable(){
 
 async function saveDelivery(){
   if(!activeCoopId) return alert('Select Co-op first');
+  const coop = coopMap[activeCoopId];
+  if(coop && coop.is_active === false){
+    alert('❌ Access Denied: This cooperative is deactivated.');
+    return;
+  }
   if(localStorage.getItem('nd_login_'+activeCoopId)!==coopMap[activeCoopId]?.password) return alert('❌ Enter password first for '+activeCoopCode);
   const farmer=document.getElementById('farmer').value.trim();
   const vol=Number(document.getElementById('volume').value);
@@ -266,6 +300,8 @@ async function saveDelivery(){
 
 async function loadClerk(){
   if(!activeCoopId) return;
+  const coop = coopMap[activeCoopId];
+  if(coop && coop.is_active === false) return;
   if(localStorage.getItem('nd_login_'+activeCoopId)!==coopMap[activeCoopId]?.password) return;
   const {data, error}=await supa.from('deliveries').select('*').eq('cooperative_id', activeCoopId).order('created_at',{ascending:false}).limit(200);
   if(error){ document.getElementById('clerkBody').innerHTML=`<tr><td colspan="4" class="p-6 text-red-600">Error: ${error.message}</td></tr>`; return; }
