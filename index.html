@@ -141,7 +141,6 @@ function switchCoop(fromUrl=false){
   const coop=coopMap[sel.value];
   if(!coop) return;
   
-  // FIXED: Check if cooperative is blocked/deactivated
   if(coop.is_active === false){ 
     alert('❌ Access Denied: This cooperative has been deactivated by the Admin.'); 
     sel.value=''; 
@@ -154,10 +153,8 @@ function switchCoop(fromUrl=false){
     return; 
   }
 
-  // Update browser URL so each coop has its separate link
   history.replaceState(null, '', '?coop=' + coop.code.toLowerCase());
 
-  // WIPE OLD DATA
   activeCoopId=coop.id; activeCoopCode=coop.code; allDeliveries=[];
   document.getElementById('activeCoopName').innerText=coop.name;
   document.getElementById('coopCode').innerText=coop.code;
@@ -229,7 +226,6 @@ async function loadCoops(){
   const {data}=await supa.from('cooperatives').select('*').order('name');
   if(!data) return; coopMap={}; data.forEach(c=> coopMap[c.id]=c);
   
-  // FIXED: Only load active cooperatives into the dropdown
   const activeOnly=data.filter(c=> c.is_active!==false);
   const sel=document.getElementById('coopSelect');
   sel.innerHTML='<option value="">Select Cooperative...</option>' + activeOnly.map(c=>`<option value="${c.id}">${c.code} - ${c.name} ${!c.password?'🆕 NO PASS':''}</option>`).join('');
@@ -248,8 +244,10 @@ async function loadCoops(){
 
   if(targetCoop){
     if(targetCoop.is_active === false){
-      alert('⚠️ The cooperative linked by URL or session has been deactivated by the admin.');
+      alert('⚠️ This cooperative has been deactivated by the admin.');
       localStorage.removeItem('nd_coop_id');
+      localStorage.removeItem('nd_login_'+targetCoop.id);
+      history.replaceState(null, '', window.location.pathname);
       return;
     }
     sel.value = targetCoop.id;
@@ -272,7 +270,6 @@ function renderTable(){
     body.innerHTML=allDeliveries.map(r=>`<tr class="border-t"><td class="p-2.5 font-mono text-[11px]">${r.batch_id}</td><td>${r.farmer_name}</td><td>${r.volume||r.litres}L</td><td>${r.quality}</td></tr>`).join('');
   }
 
-  // Populate Farmer Directory Datalist for Quick Selection
   const uniqueFarmers = [...new Set(allDeliveries.map(r => r.farmer_name).filter(Boolean))];
   const dList = document.getElementById('farmerList');
   dList.innerHTML = uniqueFarmers.map(name => `<option value="${name}">`).join('');
@@ -310,7 +307,6 @@ async function loadClerk(){
   allDeliveries.forEach(r=>{ const v=Number(r.volume||r.litres||0); total+=v; const q=(r.quality||'').toLowerCase(); if(q.includes('accepted')) acc+=v; else if(q.includes('grade b')) gb+=v; else if(q.includes('reject')) rej+=v; });
   document.getElementById('cTotal').innerText=total+' L'; document.getElementById('cAcc').innerText=acc+' L'; document.getElementById('cB').innerText=gb+' L'; document.getElementById('cRej').innerText=rej+' L';
   
-  // Update Shift Summary values
   document.getElementById('shiftBatches').innerText = allDeliveries.length;
   document.getElementById('shiftVol').innerText = total + ' L';
   document.getElementById('shiftPayout').innerText = 'KES ' + (total * 45).toLocaleString();
