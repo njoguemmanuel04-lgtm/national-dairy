@@ -226,6 +226,22 @@ function copyClerkLink(coopId) {
   alert('📋 Clerk Link Copied:\n' + link);
 }
 
+function shareOnWhatsApp(name, code, pass, coopId) {
+  const baseUrl = window.location.origin;
+  const bossLink = baseUrl + '/boss.html?coop=' + coopId;
+  const clerkLink = baseUrl + '/index.html?coop=' + coopId;
+
+  const text = `🇰🇪 *National Dairy Cooperative - Access Details*\n\n` +
+    `Hello Manager, here are your access credentials for *${name}* (${code}):\n\n` +
+    `👑 *Manager / Boss Portal:* \n${bossLink}\n\n` +
+    `📋 *Clerk Delivery Portal:* \n${clerkLink}\n\n` +
+    `🔑 *Password:* \`${pass}\`\n\n` +
+    `Please keep your password secure.`;
+
+  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+}
+
 function renderCoopList() {
   const container = document.getElementById('coopsList');
   if(allCoops.length === 0) {
@@ -247,11 +263,14 @@ function renderCoopList() {
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
+        <button onclick="shareOnWhatsApp('${c.name}', '${c.code}', '${c.password || ''}', '${c.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] px-2.5 py-1.5 rounded-lg shadow-sm flex items-center gap-1">
+          💬 Share WhatsApp
+        </button>
         <button onclick="copyBossLink('${c.id}')" class="bg-emerald-800 text-white font-bold text-[10px] px-2.5 py-1.5 rounded-lg shadow-sm">
-          👑 Copy Boss Link
+          👑 Copy Boss
         </button>
         <button onclick="copyClerkLink('${c.id}')" class="bg-gray-800 text-white font-bold text-[10px] px-2.5 py-1.5 rounded-lg shadow-sm">
-          📋 Copy Clerk Link
+          📋 Copy Clerk
         </button>
         
         <select onchange="updatePlan('${c.id}', this.value)" class="text-[10px] font-bold border rounded-lg p-1.5 bg-white">
@@ -261,7 +280,7 @@ function renderCoopList() {
         </select>
 
         <button onclick="toggleActive('${c.id}', ${c.is_active !== false})" class="text-[10px] font-bold px-3 py-1.5 rounded-lg border ${c.is_active === false ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}">
-          ${c.is_active === false ? 'Activate' : 'Block / Lock'}
+          ${c.is_active === false ? 'Activate' : 'Block'}
         </button>
       </div>
     </div>
