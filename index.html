@@ -20,84 +20,163 @@
 
 <div class="max-w-[1150px] w-[92%] mx-auto py-4">
 
-  <div class="bg-white rounded-2xl border p-3 mb-4 flex flex-col md:flex-row gap-2 md:items-center justify-between">
-    <div class="flex items-center gap-2">
-      <span class="text-[11px] font-bold bg-[#0a4d2e] text-white px-2 py-1 rounded">CO-OP ID DIVIDER</span>
-      <select id="coopSelect" onchange="switchCoop()" class="border-2 rounded-xl p-2.5 text-[12px] font-bold min-w-[240px]"><option value="">Select Cooperative...</option></select>
-    </div>
-    <div class="flex items-center gap-2">
-      <button onclick="copyCoopLink()" class="border border-[#0a7a42] text-[#0a7a42] bg-[#eef2ee] rounded-xl px-3 py-2 text-[11px] font-bold">📋 Copy Direct Link</button>
-      <div class="text-[11px] text-gray-600">Active: <b id="activeCoopName" class="text-[#0a7a42]">None</b> • <span id="coopCode" class="font-mono font-bold"></span></div>
-    </div>
-  </div>
+  <!-- SUBSCRIPTION LOCKED VIEW -->
+  <div id="subLockedView" class="hidden bg-white rounded-2xl border p-6 text-center max-w-md mx-auto my-8 shadow-sm">
+    <div class="text-4xl mb-2">🔒</div>
+    <h2 class="text-xl font-black text-red-600 mb-1 flex items-center justify-center gap-1">
+      <span class="text-red-500">⛔</span> Cooperative Subscription Needed
+    </h2>
+    <p class="text-xs text-gray-500 mb-5">Your cooperative subscription is inactive or expired.<br>Select a plan below to activate:</p>
+    
+    <div class="text-left font-bold text-xs text-gray-800 mb-2">Select Subscription Plan:</div>
 
-  <div id="registerBox" class="hidden bg-white rounded-2xl border-2 border-dashed border-[#0a7a42] p-4 mb-4">
-    <h3 class="font-bold text-[13px]">🆕 Register New Cooperative — You Create Password</h3>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
-      <input id="regName" placeholder="Coop Name" class="border rounded-xl p-2.5 text-[12px]">
-      <input id="regCode" placeholder="Code e.g. GITHUNGURI" class="border rounded-xl p-2.5 text-[12px] uppercase font-bold">
-      <div class="relative"><input id="regPass" type="password" placeholder="Create Password NOW" class="border-2 border-[#0a7a42] rounded-xl p-2.5 text-[12px] w-full pr-10"><span onclick="toggleEye('regPass','eye1')" id="eye1" class="absolute right-3 top-2.5 cursor-pointer text-[16px]">👁️</span></div>
-    </div>
-    <div class="flex gap-2 mt-2"><button onclick="registerCoop()" class="bg-[#0a7a42] text-white rounded-xl px-6 py-2.5 text-[12px] font-bold">Create Co-op</button><button onclick="hideRegister()" class="border rounded-xl px-6 py-2.5 text-[12px]">Cancel</button></div>
-    <p id="regMsg" class="text-[11px] mt-2"></p>
-  </div>
-
-  <!-- Shift Summary Modal Box -->
-  <div id="shiftModal" class="hidden bg-[#eef2ee] border-2 border-[#0a4d2e] rounded-2xl p-4 mb-4 shadow-sm">
-    <div class="flex justify-between items-center mb-2">
-      <h3 class="font-bold text-[13px] text-[#0a4d2e]">📊 Daily Shift & Collection Tally</h3>
-      <button onclick="hideShiftSummary()" class="text-xs font-bold text-red-600 bg-white px-2 py-0.5 rounded border">✕ Close</button>
-    </div>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[12px] bg-white p-3 rounded-xl border">
-      <div>Total Batches: <b id="shiftBatches">0</b></div>
-      <div>Total Volume: <b id="shiftVol">0 L</b></div>
-      <div>Est. Payout (45 KES): <b id="shiftPayout" class="text-[#0a7a42]">KES 0</b></div>
-      <div>Active Co-op: <b id="shiftCoopName">None</b></div>
-    </div>
-  </div>
-
-  <div id="loginOverlay" class="hidden bg-yellow-50 rounded-2xl border-2 border-[#0a4d2e] p-4 mb-4">
-    <h3 class="font-bold text-[14px]" id="loginTitle">🔒 Password Required</h3>
-    <p class="text-[11px] text-gray-600 mt-1">You must enter password to see milk for <b id="loginCoopName" class="text-[#0a4d2e]">this co-op</b>. Each co-op has its own separate link and password.</p>
-    <div class="flex gap-2 mt-3"><div class="relative flex-1"><input id="coopPassword" type="password" placeholder="Enter password for this co-op" class="border-2 rounded-xl p-3 text-[13px] w-full pr-10"><span onclick="toggleEye('coopPassword','eye2')" id="eye2" class="absolute right-3 top-3 cursor-pointer text-[18px]">👁️</span></div><button onclick="loginCoop()" id="loginBtn" class="bg-[#0a4d2e] text-white rounded-xl px-8 py-3 text-[13px] font-bold">Unlock</button></div>
-    <p id="loginMsg" class="text-[12px] text-red-600 mt-2 font-bold"></p>
-  </div>
-
-  <div class="bg-white rounded-2xl border p-4 mb-4">
-    <h3 class="font-bold text-[13px] mb-2">Add Delivery - Clerk <span id="coopLabel" class="text-[10px] bg-[#eef2ee] px-2 py-0.5 rounded ml-2">No Co-op</span></h3>
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-      <div class="relative">
-        <input id="farmer" list="farmerList" placeholder="Farmer Name (Select or Type)" class="border rounded-xl p-2.5 text-[12px] w-full">
-        <datalist id="farmerList"></datalist>
+    <div class="space-y-3 text-left mb-5">
+      <!-- Monthly Option -->
+      <div id="plan-monthly" onclick="selectSubPlan('Monthly', 1500)" class="border-2 border-emerald-500 bg-emerald-50/50 rounded-2xl p-3.5 flex justify-between items-center cursor-pointer transition-all">
+        <div>
+          <div class="font-bold text-xs text-gray-900">Monthly Pass</div>
+          <div class="text-[10px] text-gray-500">Standard access per month</div>
+        </div>
+        <div class="text-right">
+          <div class="font-black text-xs text-emerald-700">Ksh 1,500</div>
+          <div class="text-[9px] text-gray-400">/ month</div>
+        </div>
       </div>
-      <input id="volume" type="number" placeholder="Volume (L)" class="border rounded-xl p-2.5 text-[12px]">
-      <input id="fat" type="number" step="0.1" placeholder="Fat % 3.8" class="border rounded-xl p-2.5 text-[12px]">
-      <select id="quality" class="border rounded-xl p-2.5 text-[12px]">
-        <option>Accepted</option>
-        <option>Grade A</option>
-        <option>Grade B</option>
-        <option>Rejected</option>
-      </select>
+
+      <!-- Yearly Option -->
+      <div id="plan-yearly" onclick="selectSubPlan('Yearly', 15000)" class="relative border rounded-2xl p-3.5 flex justify-between items-center cursor-pointer transition-all hover:border-emerald-500">
+        <span class="absolute -top-2.5 right-4 bg-emerald-500 text-white text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">BEST VALUE</span>
+        <div>
+          <div class="font-bold text-xs text-gray-900">Yearly Pass</div>
+          <div class="text-[10px] text-gray-500">Save KES 3,000 / year</div>
+        </div>
+        <div class="text-right">
+          <div class="font-black text-xs text-emerald-700">Ksh 15,000</div>
+          <div class="text-[9px] text-gray-400">/ year</div>
+        </div>
+      </div>
+
+      <!-- Lifetime Option -->
+      <div id="plan-lifetime" onclick="selectSubPlan('Lifetime', 35000)" class="border rounded-2xl p-3.5 flex justify-between items-center cursor-pointer transition-all hover:border-emerald-500">
+        <div>
+          <div class="font-bold text-xs text-gray-900">Lifetime Pass 👑</div>
+          <div class="text-[10px] text-gray-500">Pay once, unlimited forever</div>
+        </div>
+        <div class="text-right">
+          <div class="font-black text-xs text-emerald-700">Ksh 35,000</div>
+          <div class="text-[9px] text-gray-400">one-time</div>
+        </div>
+      </div>
     </div>
-    <button onclick="saveDelivery()" class="w-full bg-[#0a7a42] text-white rounded-xl py-2.5 mt-3 text-[12px] font-bold">Save to National Dairy Live</button>
-    <p id="msg" class="text-[11px] mt-2"></p>
+
+    <button id="activateSubBtn" onclick="requestSubActivation()" class="w-full bg-[#0a7a42] text-white rounded-xl py-3.5 text-xs font-bold shadow-md hover:opacity-95 transition-all">
+      📲 Activate Monthly (Ksh 1,500)
+    </button>
+
+    <div id="lockedCoopId" class="text-[10px] text-gray-400 mt-4 font-mono">Co-op ID: --</div>
   </div>
 
-  <div class="bg-white rounded-2xl border p-4">
-    <h2 class="font-bold text-[14px] mb-3">Dairy Quality Monitoring — <span id="updated">Select co-op</span> • <span id="headerCoop">No Co-op</span></h2>
-    <div class="overflow-auto border rounded-xl"><table class="w-full text-[12px] min-w-[500px]"><thead class="bg-[#eef2ee]"><tr><th class="text-left p-2.5">Batch ID</th><th class="text-left">Farmer Name</th><th class="text-left">Vol</th><th class="text-left">Quality</th></tr></thead><tbody id="clerkBody"><tr><td colspan="4" class="p-8 text-center">Select a Cooperative and enter its password to view milk</td></tr></tbody></table></div>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4"><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Total</div><b id="cTotal" class="text-[22px] block">0 L</b></div><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Accepted</div><b id="cAcc" class="text-[20px] block">0 L</b></div><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Grade B</div><b id="cB" class="text-[20px] block">0 L</b></div><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Rejected</div><b id="cRej" class="text-[20px] block">0 L</b></div></div>
+  <!-- MAIN CLERK PORTAL CONTENT -->
+  <div id="mainPortalContent">
+    <div class="bg-white rounded-2xl border p-3 mb-4 flex flex-col md:flex-row gap-2 md:items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-[11px] font-bold bg-[#0a4d2e] text-white px-2 py-1 rounded">CO-OP ID DIVIDER</span>
+        <select id="coopSelect" onchange="switchCoop()" class="border-2 rounded-xl p-2.5 text-[12px] font-bold min-w-[240px]"><option value="">Select Cooperative...</option></select>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="copyCoopLink()" class="border border-[#0a7a42] text-[#0a7a42] bg-[#eef2ee] rounded-xl px-3 py-2 text-[11px] font-bold">📋 Copy Direct Link</button>
+        <div class="text-[11px] text-gray-600">Active: <b id="activeCoopName" class="text-[#0a7a42]">None</b> • <span id="coopCode" class="font-mono font-bold"></span></div>
+      </div>
+    </div>
+
+    <div id="registerBox" class="hidden bg-white rounded-2xl border-2 border-dashed border-[#0a7a42] p-4 mb-4">
+      <h3 class="font-bold text-[13px]">🆕 Register New Cooperative — You Create Password</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
+        <input id="regName" placeholder="Coop Name" class="border rounded-xl p-2.5 text-[12px]">
+        <input id="regCode" placeholder="Code e.g. GITHUNGURI" class="border rounded-xl p-2.5 text-[12px] uppercase font-bold">
+        <div class="relative"><input id="regPass" type="password" placeholder="Create Password NOW" class="border-2 border-[#0a7a42] rounded-xl p-2.5 text-[12px] w-full pr-10"><span onclick="toggleEye('regPass','eye1')" id="eye1" class="absolute right-3 top-2.5 cursor-pointer text-[16px]">👁️</span></div>
+      </div>
+      <div class="flex gap-2 mt-2"><button onclick="registerCoop()" class="bg-[#0a7a42] text-white rounded-xl px-6 py-2.5 text-[12px] font-bold">Create Co-op</button><button onclick="hideRegister()" class="border rounded-xl px-6 py-2.5 text-[12px]">Cancel</button></div>
+      <p id="regMsg" class="text-[11px] mt-2"></p>
+    </div>
+
+    <!-- Shift Summary Modal Box -->
+    <div id="shiftModal" class="hidden bg-[#eef2ee] border-2 border-[#0a4d2e] rounded-2xl p-4 mb-4 shadow-sm">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="font-bold text-[13px] text-[#0a4d2e]">📊 Daily Shift & Collection Tally</h3>
+        <button onclick="hideShiftSummary()" class="text-xs font-bold text-red-600 bg-white px-2 py-0.5 rounded border">✕ Close</button>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[12px] bg-white p-3 rounded-xl border">
+        <div>Total Batches: <b id="shiftBatches">0</b></div>
+        <div>Total Volume: <b id="shiftVol">0 L</b></div>
+        <div>Est. Payout (45 KES): <b id="shiftPayout" class="text-[#0a7a42]">KES 0</b></div>
+        <div>Active Co-op: <b id="shiftCoopName">None</b></div>
+      </div>
+    </div>
+
+    <div id="loginOverlay" class="hidden bg-yellow-50 rounded-2xl border-2 border-[#0a4d2e] p-4 mb-4">
+      <h3 class="font-bold text-[14px]" id="loginTitle">🔒 Password Required</h3>
+      <p class="text-[11px] text-gray-600 mt-1">You must enter password to see milk for <b id="loginCoopName" class="text-[#0a4d2e]">this co-op</b>. Each co-op has its own separate link and password.</p>
+      <div class="flex gap-2 mt-3"><div class="relative flex-1"><input id="coopPassword" type="password" placeholder="Enter password for this co-op" class="border-2 rounded-xl p-3 text-[13px] w-full pr-10"><span onclick="toggleEye('coopPassword','eye2')" id="eye2" class="absolute right-3 top-3 cursor-pointer text-[18px]">👁️</span></div><button onclick="loginCoop()" id="loginBtn" class="bg-[#0a4d2e] text-white rounded-xl px-8 py-3 text-[13px] font-bold">Unlock</button></div>
+      <p id="loginMsg" class="text-[12px] text-red-600 mt-2 font-bold"></p>
+    </div>
+
+    <div class="bg-white rounded-2xl border p-4 mb-4">
+      <h3 class="font-bold text-[13px] mb-2">Add Delivery - Clerk <span id="coopLabel" class="text-[10px] bg-[#eef2ee] px-2 py-0.5 rounded ml-2">No Co-op</span></h3>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+        <div class="relative">
+          <input id="farmer" list="farmerList" placeholder="Farmer Name (Select or Type)" class="border rounded-xl p-2.5 text-[12px] w-full">
+          <datalist id="farmerList"></datalist>
+        </div>
+        <input id="volume" type="number" placeholder="Volume (L)" class="border rounded-xl p-2.5 text-[12px]">
+        <input id="fat" type="number" step="0.1" placeholder="Fat % 3.8" class="border rounded-xl p-2.5 text-[12px]">
+        <select id="quality" class="border rounded-xl p-2.5 text-[12px]">
+          <option>Accepted</option>
+          <option>Grade A</option>
+          <option>Grade B</option>
+          <option>Rejected</option>
+        </select>
+      </div>
+      <button onclick="saveDelivery()" class="w-full bg-[#0a7a42] text-white rounded-xl py-2.5 mt-3 text-[12px] font-bold">Save to National Dairy Live</button>
+      <p id="msg" class="text-[11px] mt-2"></p>
+    </div>
+
+    <div class="bg-white rounded-2xl border p-4">
+      <h2 class="font-bold text-[14px] mb-3">Dairy Quality Monitoring — <span id="updated">Select co-op</span> • <span id="headerCoop">No Co-op</span></h2>
+      <div class="overflow-auto border rounded-xl"><table class="w-full text-[12px] min-w-[500px]"><thead class="bg-[#eef2ee]"><tr><th class="text-left p-2.5">Batch ID</th><th class="text-left">Farmer Name</th><th class="text-left">Vol</th><th class="text-left">Quality</th></tr></thead><tbody id="clerkBody"><tr><td colspan="4" class="p-8 text-center">Select a Cooperative and enter its password to view milk</td></tr></tbody></table></div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4"><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Total</div><b id="cTotal" class="text-[22px] block">0 L</b></div><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Accepted</div><b id="cAcc" class="text-[20px] block">0 L</b></div><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Grade B</div><b id="cB" class="text-[20px] block">0 L</b></div><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Rejected</div><b id="cRej" class="text-[20px] block">0 L</b></div></div>
+    </div>
   </div>
 </div>
 
 <script>
 let supa, allDeliveries=[], activeCoopId=null, activeCoopCode=null, coopMap={};
+let selectedPlanName = 'Monthly', selectedPlanPrice = 1500;
+
 function toggleEye(i,e){ const inp=document.getElementById(i); const eye=document.getElementById(e); if(inp.type==='password'){inp.type='text';eye.innerText='🙈';}else{inp.type='password';eye.innerText='👁️';} }
 function showRegister(){ document.getElementById('registerBox').classList.remove('hidden'); }
 function hideRegister(){ document.getElementById('registerBox').classList.add('hidden'); }
 function showShiftSummary(){ document.getElementById('shiftModal').classList.remove('hidden'); }
 function hideShiftSummary(){ document.getElementById('shiftModal').classList.add('hidden'); }
 function logoutCoop(){ if(activeCoopId) localStorage.removeItem('nd_login_'+activeCoopId); localStorage.removeItem('nd_coop_id'); history.replaceState(null,'','?'); location.reload(); }
+
+function selectSubPlan(name, price){
+  selectedPlanName = name;
+  selectedPlanPrice = price;
+  ['monthly', 'yearly', 'lifetime'].forEach(p => {
+    const el = document.getElementById('plan-' + p);
+    if(p === name.toLowerCase()){
+      el.className = "border-2 border-emerald-500 bg-emerald-50/50 rounded-2xl p-3.5 flex justify-between items-center cursor-pointer transition-all";
+    } else {
+      el.className = "border rounded-2xl p-3.5 flex justify-between items-center cursor-pointer transition-all hover:border-emerald-500";
+    }
+  });
+  document.getElementById('activateSubBtn').innerText = `📲 Activate ${name} (Ksh ${price.toLocaleString()})`;
+}
+
+function requestSubActivation(){
+  alert(`Please contact National Dairy Admin to process your M-Pesa subscription activation for ${selectedPlanName} Pass (Ksh ${selectedPlanPrice.toLocaleString()}).`);
+}
 
 function getCoopFilterFromUrl(){
   try{
@@ -127,12 +206,25 @@ async function registerCoop(){
   if(error) document.getElementById('regMsg').innerText='❌ '+error.message; else { document.getElementById('regMsg').innerText='✅ Created '+code+' with password'; hideRegister(); await loadCoops(); document.getElementById('coopSelect').value=id; switchCoop(); }
 }
 
+function showLockoutScreen(coopId){
+  document.getElementById('mainPortalContent').style.display='none';
+  document.getElementById('loginOverlay').classList.add('hidden');
+  document.getElementById('subLockedView').classList.remove('hidden');
+  document.getElementById('lockedCoopId').innerText = 'Co-op ID: ' + (coopId || 'unknown');
+}
+
+function hideLockoutScreen(){
+  document.getElementById('subLockedView').classList.add('hidden');
+  document.getElementById('mainPortalContent').style.display='block';
+}
+
 function switchCoop(fromUrl=false){
   const sel=document.getElementById('coopSelect');
   const body=document.getElementById('clerkBody');
   const overlay=document.getElementById('loginOverlay');
   
   if(!sel.value){
+    hideLockoutScreen();
     overlay.classList.add('hidden');
     body.innerHTML=`<tr><td colspan="4" class="p-8 text-center">Select a Cooperative</td></tr>`;
     document.getElementById('activeCoopName').innerText='None'; document.getElementById('coopCode').innerText=''; document.getElementById('coopLabel').innerText='No Co-op'; document.getElementById('headerCoop').innerText='No Co-op';
@@ -142,17 +234,11 @@ function switchCoop(fromUrl=false){
   if(!coop) return;
   
   if(coop.is_active === false){ 
-    alert('❌ Access Denied: This cooperative has been deactivated by the Admin.'); 
-    sel.value=''; 
-    overlay.classList.add('hidden');
-    body.innerHTML=`<tr><td colspan="4" class="p-8 text-center text-red-600 font-bold">❌ Cooperative Deactivated by Admin</td></tr>`;
-    document.getElementById('activeCoopName').innerText='Deactivated'; 
-    document.getElementById('coopCode').innerText=''; 
-    document.getElementById('coopLabel').innerText='Blocked'; 
-    document.getElementById('headerCoop').innerText='Blocked';
+    showLockoutScreen(coop.id);
     return; 
   }
 
+  hideLockoutScreen();
   history.replaceState(null, '', '?coop=' + coop.code.toLowerCase());
 
   activeCoopId=coop.id; activeCoopCode=coop.code; allDeliveries=[];
@@ -200,8 +286,7 @@ async function loginCoop(){
   const coop=coopMap[activeCoopId];
   
   if(coop && coop.is_active === false){
-    alert('❌ Access Denied: This cooperative has been deactivated by the Admin.');
-    location.reload();
+    showLockoutScreen(coop.id);
     return;
   }
 
@@ -226,9 +311,8 @@ async function loadCoops(){
   const {data}=await supa.from('cooperatives').select('*').order('name');
   if(!data) return; coopMap={}; data.forEach(c=> coopMap[c.id]=c);
   
-  const activeOnly=data.filter(c=> c.is_active!==false);
   const sel=document.getElementById('coopSelect');
-  sel.innerHTML='<option value="">Select Cooperative...</option>' + activeOnly.map(c=>`<option value="${c.id}">${c.code} - ${c.name} ${!c.password?'🆕 NO PASS':''}</option>`).join('');
+  sel.innerHTML='<option value="">Select Cooperative...</option>' + data.map(c=>`<option value="${c.id}">${c.code} - ${c.name} ${c.is_active===false?'🔒 (INACTIVE)':''} ${!c.password?'🆕 NO PASS':''}</option>`).join('');
   
   const urlFilter = getCoopFilterFromUrl();
   let targetCoop = null;
@@ -243,14 +327,11 @@ async function loadCoops(){
   }
 
   if(targetCoop){
+    sel.value = targetCoop.id;
     if(targetCoop.is_active === false){
-      alert('⚠️ This cooperative has been deactivated by the admin.');
-      localStorage.removeItem('nd_coop_id');
-      localStorage.removeItem('nd_login_'+targetCoop.id);
-      history.replaceState(null, '', window.location.pathname);
+      showLockoutScreen(targetCoop.id);
       return;
     }
-    sel.value = targetCoop.id;
     switchCoop(true);
   }
 }
@@ -259,7 +340,7 @@ function renderTable(){
   const body=document.getElementById('clerkBody');
   if(!activeCoopId) return;
   if(coopMap[activeCoopId]?.is_active === false){
-    body.innerHTML=`<tr><td colspan="4" class="p-8 text-center text-red-600 font-bold">❌ Cooperative Deactivated</td></tr>`;
+    showLockoutScreen(activeCoopId);
     return;
   }
   if(localStorage.getItem('nd_login_'+activeCoopId)!==coopMap[activeCoopId]?.password){ body.innerHTML=`<tr><td colspan="4" class="p-8 text-center">🔒 Enter password</td></tr>`; return; }
@@ -279,7 +360,7 @@ async function saveDelivery(){
   if(!activeCoopId) return alert('Select Co-op first');
   const coop = coopMap[activeCoopId];
   if(coop && coop.is_active === false){
-    alert('❌ Access Denied: This cooperative is deactivated.');
+    showLockoutScreen(coop.id);
     return;
   }
   if(localStorage.getItem('nd_login_'+activeCoopId)!==coopMap[activeCoopId]?.password) return alert('❌ Enter password first for '+activeCoopCode);
@@ -298,7 +379,10 @@ async function saveDelivery(){
 async function loadClerk(){
   if(!activeCoopId) return;
   const coop = coopMap[activeCoopId];
-  if(coop && coop.is_active === false) return;
+  if(coop && coop.is_active === false){
+    showLockoutScreen(coop.id);
+    return;
+  }
   if(localStorage.getItem('nd_login_'+activeCoopId)!==coopMap[activeCoopId]?.password) return;
   const {data, error}=await supa.from('deliveries').select('*').eq('cooperative_id', activeCoopId).order('created_at',{ascending:false}).limit(200);
   if(error){ document.getElementById('clerkBody').innerHTML=`<tr><td colspan="4" class="p-6 text-red-600">Error: ${error.message}</td></tr>`; return; }
