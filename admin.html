@@ -2,437 +2,370 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>National Dairy Tracker - Empire Admin</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui} body{background:#f8fafc;padding-bottom:20px}
-.header{background:#0f172a;color:white;padding:16px;display:flex;justify-content:space-between;position:sticky;top:0;z-index:10}
-.logo{font-weight:900;font-size:22px} .logo span{color:#10b981}
-.card{background:white;border-radius:16px;padding:16px;margin:12px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
-.btn{background:#0f172a;color:white;border:none;padding:8px 12px;border-radius:10px;font-weight:800;cursor:pointer;font-size:12px}
-.btn-accent{background:#10b981} .btn-wa{background:#25D366;color:white} .grid4{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat h2{font-size:26px} .stat p{font-size:11px;color:#64748b}
-.table{width:100%;font-size:12px;border-collapse:collapse} .table th{text-align:left;padding:8px;background:#f8fafc} .table td{padding:8px;border-bottom:1px solid #f1f5f9}
-.badge{font-size:10px;padding:3px 8px;border-radius:20px;background:#e2e8f0;font-weight:800} 
-.badge-green{background:#dcfce7;color:#166534} .badge-red{background:#fee2e2;color:#991b1b}
-.badge-blue{background:#e0f2fe;color:#0369a1} .badge-amber{background:#fef9c3;color:#a16207}
-.input,.select{width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:6px}
-</style>
+<title>National Dairy Cooperative - Kenya | Clerk</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>body{font-family:DM Sans,sans-serif;background:#f5f8f5}</style>
 </head>
 <body>
-<div class="header">
-  <div class="logo">National Dairy<span>EMPIRE</span></div>
-  <div style="font-size:12px">🇰🇪 Kenya Dairy Board | <span id="conn">LOADING...</span></div>
-</div>
-
-<div class="card">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <h3>🔒 Admin Login</h3>
-    <a href="index.html" class="btn" style="text-decoration:none">View Clerk Page</a>
+<div class="bg-[#0a4d2e] text-white text-center text-[11px] py-1.5">🇰🇪 NATIONAL DAIRY Live — Password Required • Isolated Milk Links</div>
+<header class="bg-white border-b flex justify-between items-center px-4 py-3">
+  <div class="font-bold text-[14px]">🇰🇪 National Dairy Cooperative - Kenya</div>
+  <div class="text-[12px] font-bold">
+    <span onclick="showShiftSummary()" class="cursor-pointer text-[#0a4d2e] mr-3 font-bold bg-[#eef2ee] px-2.5 py-1 rounded">📊 Shift Summary</span>
+    <span onclick="showRegister()" class="cursor-pointer text-[#0a7a42] mr-3">+ Register</span> 
+    <span onclick="logoutCoop()" class="cursor-pointer text-red-600">Logout</span>
   </div>
-  <div style="display:flex;gap:8px;margin-top:10px">
-    <input id="adminPass" type="password" class="input" placeholder="admin123" style="margin-bottom:0">
-    <button class="btn btn-accent" onclick="loginAdmin()">Unlock</button>
-  </div>
-</div>
+</header>
 
-<div id="dashboard" style="display:none">
-<div class="grid4">
-<div class="card stat"><h2 id="aTotal">0 L</h2><p>Total Collections</p><small style="color:#10b981;font-weight:800">Live National Dairy</small></div>
-<div class="card stat"><h2 id="aAcc">0 L</h2><p>Accepted Milk</p><small id="aAccP">0%</small></div>
-<div class="card stat"><h2 id="aB">0 L</h2><p>Grade B Milk</p><small id="aBP" style="color:#a16207">0%</small></div>
-<div class="card stat"><h2 id="aRej">0 L</h2><p>Rejected Milk</p><small id="aRejP" style="color:#ef4444">0%</small></div>
-</div>
+<div class="max-w-[1150px] w-[92%] mx-auto py-4">
 
-<!-- Create New Cooperative Card with Subscription Plan Selector -->
-<div class="card" style="background:#f0fdf4;border:2px solid #bbf7d0">
-  <h3>➕ Create New Cooperative - Own Link</h3>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-    <input id="newCoopName" class="input" placeholder="Co-op Name e.g. Githunguri Dairy">
-    <input id="newCoopCode" class="input" placeholder="Co-op Code e.g. GITHUNGURI">
-    <input id="newCoopPhone" class="input" placeholder="Phone e.g. 0712345678">
-    <input id="newCoopPass" class="input" placeholder="Access Password e.g. 1234">
-  </div>
-
-  <label style="font-size:12px;font-weight:700;display:block;margin-top:4px;">Subscription Plan</label>
-  <select id="newPlanType" class="select">
-    <option value="Monthly">Monthly Pass (KES 1,500 / month)</option>
-    <option value="Yearly">Yearly Pass (KES 15,000 / year)</option>
-    <option value="Lifetime">Lifetime Pass 👑 (KES 35,000 one-time)</option>
-  </select>
-
-  <div style="display:flex;gap:8px;margin-top:6px">
-    <button class="btn btn-accent" onclick="generateCoopCode()">Auto Code</button>
-    <button class="btn" onclick="createCooperative()">Create + Get Link</button>
-  </div>
-  <div id="newCoopLinkResult" style="margin-top:12px;background:white;padding:12px;border-radius:10px;display:none"></div>
-</div>
-
-<!-- M-Pesa Bulk Payout & Config Card -->
-<div class="card">
-  <h3>💰 M-Pesa Payout - National Dairy</h3>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-    <div>
-      <label style="font-size:11px;font-weight:700;display:block;margin-bottom:4px">Filter by Co-op</label>
-      <select id="adminCoopFilter" onchange="filterAdminTable()" class="select" style="background:white">
-        <option value="ALL">All Cooperatives (National View)</option>
-      </select>
+  <!-- Subscription Locked View Overlay (Dairy Scale) -->
+  <div id="subLockedView" class="hidden bg-white rounded-2xl border p-6 text-center max-w-md mx-auto my-8 shadow-sm">
+    <div class="text-4xl mb-2">🔒</div>
+    <h2 class="text-xl font-black text-red-600 mb-1">🚫 Cooperative Subscription Needed</h2>
+    <p class="text-xs text-gray-500 mb-4">Your dairy cooperative subscription is inactive or expired.<br>Select a plan below to activate:</p>
+    
+    <div class="space-y-2 text-left mb-4">
+      <div class="border-2 border-emerald-500 bg-emerald-50/50 rounded-xl p-3 flex justify-between items-center cursor-pointer">
+        <div>
+          <div class="font-bold text-xs">Monthly Pass</div>
+          <div class="text-[10px] text-gray-500">Standard dairy access per month</div>
+        </div>
+        <div class="text-right"><div class="font-black text-xs text-emerald-700">KES 1,500</div><div class="text-[9px] text-gray-400">/ month</div></div>
+      </div>
+      <div class="border rounded-xl p-3 flex justify-between items-center cursor-pointer">
+        <div>
+          <div class="font-bold text-xs">Yearly Pass <span class="bg-emerald-100 text-emerald-800 text-[9px] px-1.5 py-0.5 rounded font-bold ml-1">BEST VALUE</span></div>
+          <div class="text-[10px] text-gray-500">Save KES 3,000 / year</div>
+        </div>
+        <div class="text-right"><div class="font-black text-xs text-emerald-700">KES 15,000</div><div class="text-[9px] text-gray-400">/ year</div></div>
+      </div>
+      <div class="border rounded-xl p-3 flex justify-between items-center cursor-pointer">
+        <div>
+          <div class="font-bold text-xs">Lifetime Pass 👑</div>
+          <div class="text-[10px] text-gray-500">Pay once, unlimited forever</div>
+        </div>
+        <div class="text-right"><div class="font-black text-xs text-emerald-700">KES 35,000</div><div class="text-[9px] text-gray-400">one-time</div></div>
+      </div>
     </div>
-    <div>
-      <label style="font-size:11px;font-weight:700;display:block;margin-bottom:4px">Rate per Litre (KES)</label>
-      <input id="payoutRate" type="number" value="45" oninput="recalculatePayout()" class="input" style="background:white;margin-bottom:0">
-    </div>
+
+    <button onclick="alert('Please contact National Dairy Admin to process your M-Pesa subscription activation.')" class="w-full bg-[#0a7a42] text-white rounded-xl py-3 text-xs font-bold shadow-md hover:opacity-90">📱 Activate Monthly (KES 1,500)</button>
+    <div id="lockedCoopId" class="text-[10px] text-gray-400 mt-3 font-mono">Co-op ID: --</div>
   </div>
 
-  <div style="margin-top:10px;background:#f8fafc;padding:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center">
-    <div>
-      <div style="font-size:11px;color:#64748b">Deliveries Count: <span id="payCount">0</span></div>
-      <div style="font-size:14px;font-weight:900;color:#0f172a">Total Payable: <span id="payTotal" style="color:#10b981">KES 0</span></div>
+  <div id="mainPortalContent">
+    <div class="bg-white rounded-2xl border p-3 mb-4 flex flex-col md:flex-row gap-2 md:items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-[11px] font-bold bg-[#0a4d2e] text-white px-2 py-1 rounded">CO-OP ID DIVIDER</span>
+        <select id="coopSelect" onchange="switchCoop()" class="border-2 rounded-xl p-2.5 text-[12px] font-bold min-w-[240px]"><option value="">Select Cooperative...</option></select>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="copyCoopLink()" class="border border-[#0a7a42] text-[#0a7a42] bg-[#eef2ee] rounded-xl px-3 py-2 text-[11px] font-bold">📋 Copy Direct Link</button>
+        <div class="text-[11px] text-gray-600">Active: <b id="activeCoopName" class="text-[#0a7a42]">None</b> • <span id="coopCode" class="font-mono font-bold"></span></div>
+      </div>
     </div>
-    <button class="btn btn-accent" onclick="processPayout()">Process Bulk Payout</button>
-  </div>
-  <p id="payMsg" style="font-size:11px;color:#166534;font-weight:700;margin-top:8px"></p>
-</div>
 
-<!-- Cooperatives Access Control Card with Plans & Share Links -->
-<div class="card">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <h3>Cooperatives Access Control</h3>
-    <button class="btn" style="padding:4px 8px;font-size:10px" onclick="loadCoopsAdmin()">Refresh Co-ops</button>
-  </div>
-  <div id="coopList" style="margin-top:10px;max-height:350px;overflow-y:auto"></div>
-</div>
+    <div id="registerBox" class="hidden bg-white rounded-2xl border-2 border-dashed border-[#0a7a42] p-4 mb-4">
+      <h3 class="font-bold text-[13px]">🆕 Register New Cooperative — You Create Password</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
+        <input id="regName" placeholder="Coop Name" class="border rounded-xl p-2.5 text-[12px]">
+        <input id="regCode" placeholder="Code e.g. GITHUNGURI" class="border rounded-xl p-2.5 text-[12px] uppercase font-bold">
+        <div class="relative"><input id="regPass" type="password" placeholder="Create Password NOW" class="border-2 border-[#0a7a42] rounded-xl p-2.5 text-[12px] w-full pr-10"><span onclick="toggleEye('regPass','eye1')" id="eye1" class="absolute right-3 top-2.5 cursor-pointer text-[16px]">👁️</span></div>
+      </div>
+      <div class="flex gap-2 mt-2"><button onclick="registerCoop()" class="bg-[#0a7a42] text-white rounded-xl px-6 py-2.5 text-[12px] font-bold">Create Co-op</button><button onclick="hideRegister()" class="border rounded-xl px-6 py-2.5 text-[12px]">Cancel</button></div>
+      <p id="regMsg" class="text-[11px] mt-2"></p>
+    </div>
 
-<!-- All Deliveries Table Card -->
-<div class="card">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <h3>All Deliveries — Edit/Delete Live</h3>
-    <div style="display:flex;gap:6px">
-      <input id="search" class="input" placeholder="Search farmer, batch..." style="width:180px;margin-bottom:0" oninput="filterAdminTable()">
-      <button class="btn" style="background:#e2e8f0;color:#0f172a" onclick="exportToCSV()">Export CSV</button>
+    <!-- Shift Summary Modal Box -->
+    <div id="shiftModal" class="hidden bg-[#eef2ee] border-2 border-[#0a4d2e] rounded-2xl p-4 mb-4 shadow-sm">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="font-bold text-[13px] text-[#0a4d2e]">📊 Daily Shift & Collection Tally</h3>
+        <button onclick="hideShiftSummary()" class="text-xs font-bold text-red-600 bg-white px-2 py-0.5 rounded border">✕ Close</button>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[12px] bg-white p-3 rounded-xl border">
+        <div>Total Batches: <b id="shiftBatches">0</b></div>
+        <div>Total Volume: <b id="shiftVol">0 L</b></div>
+        <div>Est. Payout (45 KES): <b id="shiftPayout" class="text-[#0a7a42]">KES 0</b></div>
+        <div>Active Co-op: <b id="shiftCoopName">None</b></div>
+      </div>
+    </div>
+
+    <div id="loginOverlay" class="hidden bg-yellow-50 rounded-2xl border-2 border-[#0a4d2e] p-4 mb-4">
+      <h3 class="font-bold text-[14px]" id="loginTitle">🔒 Password Required</h3>
+      <p class="text-[11px] text-gray-600 mt-1">You must enter password to see milk for <b id="loginCoopName" class="text-[#0a4d2e]">this co-op</b>. Each co-op has its own separate link and password.</p>
+      <div class="flex gap-2 mt-3"><div class="relative flex-1"><input id="coopPassword" type="password" placeholder="Enter password for this co-op" class="border-2 rounded-xl p-3 text-[13px] w-full pr-10"><span onclick="toggleEye('coopPassword','eye2')" id="eye2" class="absolute right-3 top-3 cursor-pointer text-[18px]">👁️</span></div><button onclick="loginCoop()" id="loginBtn" class="bg-[#0a4d2e] text-white rounded-xl px-8 py-3 text-[13px] font-bold">Unlock</button></div>
+      <p id="loginMsg" class="text-[12px] text-red-600 mt-2 font-bold"></p>
+    </div>
+
+    <div class="bg-white rounded-2xl border p-4 mb-4">
+      <h3 class="font-bold text-[13px] mb-2">Add Delivery - Clerk <span id="coopLabel" class="text-[10px] bg-[#eef2ee] px-2 py-0.5 rounded ml-2">No Co-op</span></h3>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+        <div class="relative">
+          <input id="farmer" list="farmerList" placeholder="Farmer Name (Select or Type)" class="border rounded-xl p-2.5 text-[12px] w-full">
+          <datalist id="farmerList"></datalist>
+        </div>
+        <input id="volume" type="number" placeholder="Volume (L)" class="border rounded-xl p-2.5 text-[12px]">
+        <input id="fat" type="number" step="0.1" placeholder="Fat % 3.8" class="border rounded-xl p-2.5 text-[12px]">
+        <select id="quality" class="border rounded-xl p-2.5 text-[12px]">
+          <option>Accepted</option>
+          <option>Grade A</option>
+          <option>Grade B</option>
+          <option>Rejected</option>
+        </select>
+      </div>
+      <button onclick="saveDelivery()" class="w-full bg-[#0a7a42] text-white rounded-xl py-2.5 mt-3 text-[12px] font-bold">Save to National Dairy Live</button>
+      <p id="msg" class="text-[11px] mt-2"></p>
+    </div>
+
+    <div class="bg-white rounded-2xl border p-4">
+      <h2 class="font-bold text-[14px] mb-3">Dairy Quality Monitoring — <span id="updated">Select co-op</span> • <span id="headerCoop">No Co-op</span></h2>
+      <div class="overflow-auto border rounded-xl"><table class="w-full text-[12px] min-w-[500px]"><thead class="bg-[#eef2ee]"><tr><th class="text-left p-2.5">Batch ID</th><th class="text-left">Farmer Name</th><th class="text-left">Vol</th><th class="text-left">Quality</th></tr></thead><tbody id="clerkBody"><tr><td colspan="4" class="p-8 text-center">Select a Cooperative and enter its password to view milk</td></tr></tbody></table></div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4"><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Total</div><b id="cTotal" class="text-[22px] block">0 L</b></div><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Accepted</div><b id="cAcc" class="text-[20px] block">0 L</b></div><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Grade B</div><b id="cB" class="text-[20px] block">0 L</b></div><div class="border rounded-xl p-4 text-center"><div class="text-[12px]">Rejected</div><b id="cRej" class="text-[20px] block">0 L</b></div></div>
     </div>
   </div>
-  <div style="overflow-x:auto;margin-top:10px">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Co-op</th>
-          <th>Batch</th>
-          <th>Farmer</th>
-          <th>Vol</th>
-          <th>Fat%</th>
-          <th>Quality</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="adminBody">
-        <tr><td colspan="7" style="text-align:center;padding:12px">Loading deliveries...</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <small style="display:block;margin-top:8px;color:#64748b">Note: Kenya Dairy Board — Accepted, Grade A, Grade B, Rejected only. No A+ grade.</small>
-</div>
 </div>
 
 <script>
-let supa; 
-let adminData=[]; 
-let coopsData=[];
+let supa, allDeliveries=[], activeCoopId=null, activeCoopCode=null, coopMap={};
+function toggleEye(i,e){ const inp=document.getElementById(i); const eye=document.getElementById(e); if(inp.type==='password'){inp.type='text';eye.innerText='🙈';}else{inp.type='password';eye.innerText='👁️';} }
+function showRegister(){ document.getElementById('registerBox').classList.remove('hidden'); }
+function hideRegister(){ document.getElementById('registerBox').classList.add('hidden'); }
+function showShiftSummary(){ document.getElementById('shiftModal').classList.remove('hidden'); }
+function hideShiftSummary(){ document.getElementById('shiftModal').classList.add('hidden'); }
+function logoutCoop(){ if(activeCoopId) localStorage.removeItem('nd_login_'+activeCoopId); localStorage.removeItem('nd_coop_id'); history.replaceState(null,'','?'); location.reload(); }
 
-async function initSupabase(){
-  let cfg; 
-  try{ 
-    const res = await fetch('/api/config'); 
-    cfg = await res.json(); 
-    if(!cfg.url||!cfg.anonKey) throw 0; 
-  }catch{ 
-    cfg = {
-      url: "https://hkhqbtyyqgvaktamilxs.supabase.co", 
-      anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhraHFidHl5cWd2YWt0YW1pbHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMTQwNDQsImV4cCI6MjEwNjU5MDA0NH0.gJcUf9XgzF34sczhD79V9oOnPD7a3XEU-5BXoQHWuAg"
-    }; 
-  } 
-  supa = supabase.createClient(cfg.url, cfg.anonKey);
-  document.getElementById('conn').innerText='ONLINE ✓';
-}
-initSupabase();
-
-function loginAdmin(){ 
-  if(document.getElementById('adminPass').value!=='admin123') return alert('Wrong password'); 
-  document.getElementById('dashboard').style.display='block'; 
-  loadCoopsAdmin();
-  loadAdmin(); 
-}
-
-// Fixed Production Domain Mapping
-function getCoopLink(code){ 
-  return `https://national-dairy.vercel.app/index.html?coop=${encodeURIComponent(code)}`; 
-}
-
-function formatPhone(p){ 
-  if(!p) return ''; 
-  let n=p.replace(/\D/g,''); 
-  if(n.startsWith('0')) n='254'+n.slice(1); 
-  return n; 
-}
-
-function waCoopLink(name, code, phone, pass){
-  let link = getCoopLink(code);
-  let msg = `Karibu ${name}! 🥛\n\nYour National Dairy Portal link is ready[span_0](start_span)[span_0](end_span).\nClick here to access your portal:\n${link}\n\nCo-op Code: ${code}\nPassword: ${pass||'Set by admin'}\n\nSave this link. Karibu sana!`;
-  if(phone){ return `https://wa.me/${formatPhone(phone)}?text=${encodeURIComponent(msg)}`; }
-  return `https://wa.me/?text=${encodeURIComponent(msg)}`;
-}
-
-function generateCoopCode(){
-  let name = document.getElementById('newCoopName').value.trim().toUpperCase().replace(/\s+/g,'-')||'COOP';
-  let rand = Math.floor(Math.random()*900+100);
-  document.getElementById('newCoopCode').value = `${name}-${rand}`;
-}
-
-async function createCooperative(){
-  let name = document.getElementById('newCoopName').value.trim();
-  let code = document.getElementById('newCoopCode').value.trim();
-  let phone = document.getElementById('newCoopPhone').value.trim();
-  let pass = document.getElementById('newCoopPass').value.trim();
-  let planType = document.getElementById('newPlanType').value;
-
-  if(!name || !code) return alert('Please enter Co-op Name and Code');
-
-  const { error } = await supa.from('cooperatives').insert({
-    id: code.toLowerCase(),
-    code: code,
-    name: name,
-    password: pass,
-    plan_type: planType,
-    is_active: true
-  });
-
-  if(error) return alert('Error creating cooperative: ' + error.message);
-
-  let link = getCoopLink(code);
-  let w = waCoopLink(name, code, phone, pass);
-
-  document.getElementById('newCoopLinkResult').style.display = 'block';
-  document.getElementById('newCoopLinkResult').innerHTML = `
-    ✅ Created Cooperative with <b>${planType}</b> Plan!<br>
-    <b>${name}</b> (${code})<br>
-    <a href="${link}" target="_blank" style="color:#0f766e;font-weight:800;word-break:break-all">${link}</a><br><br>
-    <div style="display:flex;gap:6px;flex-wrap:wrap">
-      <button class="btn btn-accent" onclick="navigator.clipboard.writeText('${link}');alert('Link Copied!')">📋 Copy Link</button>
-      <button class="btn btn-wa" onclick="window.open('${w}','_blank')">💬 WhatsApp Share</button>
-    </div>
-  `;
-
-  loadCoopsAdmin();
-}
-
-async function updateCoopPlan(id, newPlan){
-  let {error} = await supa.from('cooperatives').update({plan_type: newPlan}).eq('id', id);
-  if(error) return alert('Failed to update plan: '+error.message);
-  alert(`Updated cooperative plan to ${newPlan}!`);
-  loadCoopsAdmin();
-}
-
-function badge(q){ 
-  q=(q||'').toLowerCase(); 
-  if(q.includes('accept')) return `<span class="badge badge-green">Accepted</span>`; 
-  if(q.includes('grade a')) return `<span class="badge badge-blue">Grade A</span>`; 
-  if(q.includes('grade b')) return `<span class="badge badge-amber">Grade B</span>`; 
-  return `<span class="badge badge-red">Rejected</span>`; 
-}
-
-async function loadAdmin(){
+function getCoopFilterFromUrl(){
   try{
-    const { data, error } = await supa.from('deliveries').select('*').order('created_at',{ascending:false}).limit(300);
-    if(error) throw error;
-    adminData=data||[];
-    filterAdminTable();
-  }catch(e){ 
-    document.getElementById('adminBody').innerHTML=`<tr><td colspan=7 style="color:red;padding:12px">Error: ${e.message}</td></tr>`; 
-  }
+    const params=new URLSearchParams(window.location.search);
+    let f=params.get('coop')||params.get('c');
+    const parts=window.location.pathname.split('/').filter(Boolean);
+    if(!f && parts[0]==='coop' && parts[1]) f=parts[1];
+    return f?f.toLowerCase().trim():null;
+  }catch{return null;}
 }
 
-function filterAdminTable(){
-  const filterVal = document.getElementById('adminCoopFilter').value;
-  const query = document.getElementById('search')?.value.toLowerCase()||'';
+function copyCoopLink(){
+  if(!activeCoopCode){alert('Select a cooperative first!');return;}
+  const link = window.location.origin + window.location.pathname + '?coop=' + activeCoopCode.toLowerCase();
+  navigator.clipboard.writeText(link);
+  alert('✅ Direct link copied for ' + activeCoopCode + ':\n' + link);
+}
+
+async function registerCoop(){
+  const name=document.getElementById('regName').value.trim();
+  let code=document.getElementById('regCode').value.trim().toUpperCase();
+  const pass=document.getElementById('regPass').value.trim();
+  if(!name||!code||!pass) return document.getElementById('regMsg').innerText='❌ Fill all + password required';
+  if(pass.length<4) return document.getElementById('regMsg').innerText='❌ Password min 4 chars';
+  const id=code.toLowerCase();
+  const {error}=await supa.from('cooperatives').insert([{id, code, name, password:pass, is_active:true}]);
+  if(error) document.getElementById('regMsg').innerText='❌ '+error.message; else { document.getElementById('regMsg').innerText='✅ Created '+code+' with password'; hideRegister(); await loadCoops(); document.getElementById('coopSelect').value=id; switchCoop(); }
+}
+
+function switchCoop(fromUrl=false){
+  const sel=document.getElementById('coopSelect');
+  const body=document.getElementById('clerkBody');
+  const overlay=document.getElementById('loginOverlay');
+  const lockedView=document.getElementById('subLockedView');
+  const mainContent=document.getElementById('mainPortalContent');
   
-  let filtered = adminData;
-  if(filterVal !== 'ALL'){
-    filtered = filtered.filter(r => (r.cooperative_id || '').toLowerCase() === filterVal.toLowerCase() || (r.coop_code || '').toLowerCase() === filterVal.toLowerCase());
+  if(!sel.value){
+    overlay.classList.add('hidden');
+    lockedView.classList.add('hidden');
+    mainContent.style.display='block';
+    body.innerHTML=`<tr><td colspan="4" class="p-8 text-center">Select a Cooperative</td></tr>`;
+    document.getElementById('activeCoopName').innerText='None'; document.getElementById('coopCode').innerText=''; document.getElementById('coopLabel').innerText='No Co-op'; document.getElementById('headerCoop').innerText='No Co-op';
+    return;
   }
+  const coop=coopMap[sel.value];
+  if(!coop) return;
   
-  if(query.trim() !== ''){
-    filtered = filtered.filter(r => 
-      (r.farmer_name || r.farmer || '').toLowerCase().includes(query) ||
-      (r.batch_id || '').toLowerCase().includes(query) ||
-      (r.coop_code || '').toLowerCase().includes(query)
-    );
+  if(coop.is_active === false){ 
+    overlay.classList.add('hidden');
+    mainContent.style.display='none';
+    lockedView.classList.remove('hidden');
+    document.getElementById('lockedCoopId').innerText = 'Co-op ID: ' + coop.id;
+    return; 
   }
-  
-  const tbody = document.getElementById('adminBody');
-  if(filtered.length === 0){
-    tbody.innerHTML = `<tr><td colspan=7 style="text-align:center;padding:12px;color:#64748b">No deliveries found</td></tr>`;
-    updateStats({total:0,acc:0,b:0,rej:0,count:0});
+
+  lockedView.classList.add('hidden');
+  mainContent.style.display='block';
+
+  history.replaceState(null, '', '?coop=' + coop.code.toLowerCase());
+
+  activeCoopId=coop.id; activeCoopCode=coop.code; allDeliveries=[];
+  document.getElementById('activeCoopName').innerText=coop.name;
+  document.getElementById('coopCode').innerText=coop.code;
+  document.getElementById('coopLabel').innerText=coop.code;
+  document.getElementById('headerCoop').innerText=coop.name;
+  document.getElementById('updated').innerText=new Date().toLocaleString('en-KE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('cTotal').innerText='0 L'; document.getElementById('cAcc').innerText='0 L'; document.getElementById('cB').innerText='0 L'; document.getElementById('cRej').innerText='0 L';
+  document.getElementById('msg').innerText='';
+
+  const coopNameEl = document.getElementById('loginCoopName');
+  if(coopNameEl) coopNameEl.innerText = coop.name;
+
+  document.getElementById('coopPassword').value=''; document.getElementById('coopPassword').type='password'; document.getElementById('eye2').innerText='👁️';
+
+  if(!coop.password || coop.password.trim()===''){
+    document.getElementById('loginTitle').innerText='🆕 Create Password for '+coop.name;
+    document.getElementById('loginBtn').innerText='Set Password';
+    document.getElementById('loginMsg').innerText='This co-op has NO password yet. Create one now!';
+    body.innerHTML=`<tr><td colspan="4" class="p-8 text-center text-orange-600 font-bold">🆕 ${coop.code} has no password — Create password first</td></tr>`;
+    overlay.classList.remove('hidden');
     return;
   }
 
-  let total=0, acc=0, b=0, rej=0;
-  filtered.forEach(r => {
-    const vol = Number(r.volume ?? r.litres ?? 0);
-    total += vol;
-    const q = (r.quality||'').toLowerCase();
-    if(q.includes('accept')) acc += vol;
-    else if(q.includes('grade b')) b += vol;
-    else if(q.includes('reject')) rej += vol;
-  });
-
-  tbody.innerHTML = filtered.map(r => {
-    const vol = Number(r.volume ?? r.litres ?? 0);
-    const farmer = r.farmer_name || r.farmer || 'Unknown';
-    const batch = r.batch_id || (r.id||'').slice(0,8) || 'BD-';
-    const fat = r.fat_percent ?? r.fat ?? 3.5;
-    const coop = r.coop_code || r.cooperative_id || 'GENERAL';
-    return `<tr>
-      <td><b>${coop}</b></td>
-      <td><span style="font-family:monospace;font-size:11px">${batch}</span></td>
-      <td>${farmer}</td>
-      <td><b>${vol} L</b></td>
-      <td>${Number(fat).toFixed(1)}%</td>
-      <td>${badge(r.quality)}</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn" style="padding:4px 8px;font-size:10px;background:#e2e8f0;color:#0f172a" onclick="editRow('${r.id}')">Edit</button>
-          <button class="btn" style="padding:4px 8px;font-size:10px;background:#fee2e2;color:#991b1b" onclick="deleteRow('${r.id}')">Delete</button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
-
-  updateStats({total, acc, b, rej, count: filtered.length});
-}
-
-function recalculatePayout(){
-  const totalL = parseFloat(document.getElementById('aTotal').innerText) || 0;
-  const rate = parseFloat(document.getElementById('payoutRate').value) || 0;
-  document.getElementById('payTotal').innerText = "KES " + (totalL * rate).toLocaleString();
-}
-
-function updateStats({total=0,acc=0,b=0,rej=0,count=0}={}){
-  document.getElementById('aTotal').innerText = total + " L";
-  document.getElementById('aAcc').innerText = acc + " L";
-  document.getElementById('aB').innerText = b + " L";
-  document.getElementById('aRej').innerText = rej + " L";
-  document.getElementById('aAccP').innerText = (total ? Math.round(acc/total*100) : 0) + "% of total";
-  document.getElementById('aBP').innerText = (total ? Math.round(b/total*100) : 0) + "%";
-  document.getElementById('aRejP').innerText = (total ? Math.round(rej/total*100) : 0) + "%";
-  document.getElementById('payCount').innerText = count;
-  recalculatePayout();
-}
-
-async function deleteRow(id){
-  if(!confirm('Delete this delivery record from National Dairy?')) return;
-  const {error} = await supa.from('deliveries').delete().eq('id',id);
-  if(error) alert(error.message); else loadAdmin();
-}
-
-async function editRow(id){
-  const row = adminData.find(r => r.id === id);
-  const newVol = prompt(`Edit volume for ${row.farmer_name||row.farmer} (current ${row.volume||row.litres}L):`, row.volume??row.litres);
-  if(newVol === null) return;
-  const newQuality = prompt(`Edit quality (Accepted, Grade A, Grade B, Rejected):`, row.quality);
-  if(newQuality === null) return;
-  const {error} = await supa.from('deliveries').update({ volume: Number(newVol), quality: newQuality }).eq('id',id);
-  if(error) alert(error.message); else loadAdmin();
-}
-
-async function loadCoopsAdmin(){
-  try{
-    const {data, error} = await supa.from('cooperatives').select('*').order('name');
-    if(error){
-      document.getElementById('coopList').innerHTML = `<div style="color:red;font-size:11px">Error loading co-ops: ${error.message}</div>`;
-      return;
-    }
-    if(!data || !data.length){
-      document.getElementById('coopList').innerHTML = `<div style="color:#64748b;font-size:11px">No cooperatives found</div>`;
-      return;
-    }
-    coopsData = data;
-    
-    const filterSel = document.getElementById('adminCoopFilter');
-    filterSel.innerHTML = '<option value="ALL">All Cooperatives (National View)</option>' + 
-      data.map(c => `<option value="${c.id}">${c.code || c.id} - ${c.name}</option>`).join('');
-
-    document.getElementById('coopList').innerHTML = data.map(c => {
-      const isActive = c.is_active !== false;
-      const pass = c.password ? c.password : '';
-      const coopCode = c.code || c.id;
-      const link = getCoopLink(coopCode);
-      const w = waCoopLink(c.name, coopCode, c.phone, pass);
-      const plan = c.plan_type || 'Monthly';
-      const planColor = plan === 'Lifetime' ? 'background:#9333ea;color:#fff' : (plan === 'Yearly' ? 'background:#2563eb;color:#fff' : 'background:#10b981;color:#fff');
-
-      return `
-      <div style="border-bottom:1px solid #f1f5f9;padding:10px 0;display:flex;justify-content:space-between;align-items:center;font-size:12px;flex-wrap:wrap;gap:8px">
-        <div>
-          <b>${c.name}</b> <span class="badge">${coopCode}</span><br>
-          <span style="font-size:11px;color:#64748b">Pass: <b id="passDisplay_${c.id}">${pass ? '••••••' : 'No Pass'}</b></span>
-        </div>
-        <div>
-          <span class="badge" style="${planColor}">${plan}</span><br>
-          <select onchange="updateCoopPlan('${c.id}', this.value)" class="select" style="padding:2px;font-size:10px;margin-top:4px;width:90px">
-            <option value="Monthly" ${plan==='Monthly'?'selected':''}>Monthly</option>
-            <option value="Yearly" ${plan==='Yearly'?'selected':''}>Yearly</option>
-            <option value="Lifetime" ${plan==='Lifetime'?'selected':''}>Lifetime 👑</option>
-          </select>
-        </div>
-        <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">
-          <button class="btn" style="padding:4px 8px;font-size:10px;background:#e6f9ed;color:#0f766e" onclick="navigator.clipboard.writeText('${link}');alert('Copied Link!')">Copy</button>
-          <button class="btn btn-wa" style="padding:4px 8px;font-size:10px" onclick="window.open('${w}','_blank')">WhatsApp</button>
-          <button class="btn" style="padding:4px 8px;font-size:10px;background:#f1f5f9;color:#0f172a" onclick="togglePassView('${c.id}', '${pass}')">View</button>
-          <button class="btn" style="padding:4px 8px;font-size:10px;background:${isActive?'#dcfce7;color:#166534':'#fee2e2;color:#991b1b'}" onclick="toggleCoopStatus('${c.id}', ${isActive})">${isActive?'Active':'Blocked'}</button>
-        </div>
-      </div>
-      `;
-    }).join('');
-  }catch(e){
-    document.getElementById('coopList').innerHTML = `<div style="color:red;font-size:11px">Error: ${e.message}</div>`;
-  }
-}
-
-function togglePassView(id, actualPass){
-  const el = document.getElementById(`passDisplay_${id}`);
-  if(!el) return;
-  if(el.innerText === '••••••' || el.innerText === 'No Pass'){
-    el.innerText = actualPass || 'NO PASS';
+  const savedPass = localStorage.getItem('nd_login_'+activeCoopId);
+  if(savedPass === coop.password){
+    overlay.classList.add('hidden');
+    body.innerHTML=`<tr><td colspan="4" class="p-8 text-center">Loading ${coop.code} milk...</td></tr>`;
+    localStorage.setItem('nd_coop_id', activeCoopId);
+    loadClerk();
   } else {
-    el.innerText = actualPass ? '••••••' : 'No Pass';
+    document.getElementById('loginTitle').innerText='🔒 Enter Password for '+coop.name;
+    document.getElementById('loginBtn').innerText='Unlock';
+    document.getElementById('loginMsg').innerText='Password required to view milk for '+coop.code;
+    body.innerHTML=`<tr><td colspan="4" class="p-8 text-center text-gray-500">🔒 Enter password to view <b>${coop.code}</b> milk<br>Isolated — other co-ops milk hidden</td></tr>`;
+    overlay.classList.remove('hidden');
   }
 }
 
-async function toggleCoopStatus(id, currentActive){
-  const newStatus = !currentActive;
-  const {error} = await supa.from('cooperatives').update({is_active: newStatus}).eq('id', id);
-  if(error) alert(error.message); else loadCoopsAdmin();
+async function loginCoop(){
+  const entered=document.getElementById('coopPassword').value.trim();
+  const msg=document.getElementById('loginMsg');
+  if(!entered) return msg.innerText='Enter password!';
+  const coop=coopMap[activeCoopId];
+  
+  if(coop && coop.is_active === false){
+    document.getElementById('mainPortalContent').style.display='none';
+    document.getElementById('subLockedView').classList.remove('hidden');
+    document.getElementById('lockedCoopId').innerText = 'Co-op ID: ' + coop.id;
+    return;
+  }
+
+  if(!coop.password || coop.password.trim()===''){
+    const {error}=await supa.from('cooperatives').update({password:entered}).eq('id', activeCoopId);
+    if(error) return msg.innerText=error.message;
+    coop.password=entered; coopMap[activeCoopId]=coop;
+    localStorage.setItem('nd_login_'+activeCoopId, entered); localStorage.setItem('nd_coop_id', activeCoopId);
+    document.getElementById('loginOverlay').classList.add('hidden');
+    msg.innerText=''; loadClerk();
+  } else {
+    if(entered===coop.password){
+      localStorage.setItem('nd_login_'+activeCoopId, entered); localStorage.setItem('nd_coop_id', activeCoopId);
+      document.getElementById('loginOverlay').classList.add('hidden'); msg.innerText=''; loadClerk();
+    } else {
+      msg.innerText='❌ Wrong password for '+coop.code+'! Try again. Eye icon 👁️ to see';
+    }
+  }
 }
 
-function processPayout(){
-  const totalL = document.getElementById('aTotal').innerText;
-  const payable = document.getElementById('payTotal').innerText;
-  document.getElementById('payMsg').innerText = `✅ M-Pesa Bulk Request initiated for ${totalL} = ${payable}!`;
+async function loadCoops(){
+  const {data}=await supa.from('cooperatives').select('*').order('name');
+  if(!data) return; coopMap={}; data.forEach(c=> coopMap[c.id]=c);
+  
+  const activeOnly=data.filter(c=> c.is_active!==false);
+  const sel=document.getElementById('coopSelect');
+  sel.innerHTML='<option value="">Select Cooperative...</option>' + activeOnly.map(c=>`<option value="${c.id}">${c.code} - ${c.name} ${!c.password?'🆕 NO PASS':''}</option>`).join('');
+  
+  const urlFilter = getCoopFilterFromUrl();
+  let targetCoop = null;
+  if(urlFilter){
+    targetCoop = data.find(c => (c.code.toLowerCase() === urlFilter || c.id.toLowerCase() === urlFilter));
+  }
+  if(!targetCoop){
+    const saved = localStorage.getItem('nd_coop_id');
+    if(saved && coopMap[saved]){
+      targetCoop = coopMap[saved];
+    }
+  }
+
+  if(targetCoop){
+    if(targetCoop.is_active === false){
+      document.getElementById('mainPortalContent').style.display='none';
+      document.getElementById('subLockedView').classList.remove('hidden');
+      document.getElementById('lockedCoopId').innerText = 'Co-op ID: ' + targetCoop.id;
+      localStorage.removeItem('nd_coop_id');
+      localStorage.removeItem('nd_login_'+targetCoop.id);
+      return;
+    }
+    sel.value = targetCoop.id;
+    switchCoop(true);
+  }
 }
 
-function exportToCSV(){
-  if(!adminData.length) return alert('No delivery data to export');
-  let csv = 'Batch ID,Cooperative,Farmer Name,Volume (L),Fat %,Quality,Date\n';
-  adminData.forEach(r => {
-    csv += `"${r.batch_id||''}","${r.coop_code||''}","${r.farmer_name||''}","${r.volume||0}","${r.fat_percent||3.5}","${r.quality||''}","${r.created_at||''}"\n`;
-  });
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.setAttribute('href', url);
-  a.setAttribute('download', `National_Dairy_Report_${new Date().toISOString().slice(0,10)}.csv`);
-  a.click();
+function renderTable(){
+  const body=document.getElementById('clerkBody');
+  if(!activeCoopId) return;
+  if(coopMap[activeCoopId]?.is_active === false){
+    document.getElementById('mainPortalContent').style.display='none';
+    document.getElementById('subLockedView').classList.remove('hidden');
+    document.getElementById('lockedCoopId').innerText = 'Co-op ID: ' + activeCoopId;
+    return;
+  }
+  if(localStorage.getItem('nd_login_'+activeCoopId)!==coopMap[activeCoopId]?.password){ body.innerHTML=`<tr><td colspan="4" class="p-8 text-center">🔒 Enter password</td></tr>`; return; }
+  
+  if(allDeliveries.length===0){
+    body.innerHTML=`<tr><td colspan="4" class="p-10 text-center text-gray-500">No milk yet for <b>${activeCoopCode}</b><br><span class="text-[11px]">Add first farmer above — data is isolated</span></td></tr>`;
+  } else {
+    body.innerHTML=allDeliveries.map(r=>`<tr class="border-t"><td class="p-2.5 font-mono text-[11px]">${r.batch_id}</td><td>${r.farmer_name}</td><td>${r.volume||r.litres}L</td><td>${r.quality}</td></tr>`).join('');
+  }
+
+  const uniqueFarmers = [...new Set(allDeliveries.map(r => r.farmer_name).filter(Boolean))];
+  const dList = document.getElementById('farmerList');
+  dList.innerHTML = uniqueFarmers.map(name => `<option value="${name}">`).join('');
 }
+
+async function saveDelivery(){
+  if(!activeCoopId) return alert('Select Co-op first');
+  const coop = coopMap[activeCoopId];
+  if(coop && coop.is_active === false){
+    document.getElementById('mainPortalContent').style.display='none';
+    document.getElementById('subLockedView').classList.remove('hidden');
+    document.getElementById('lockedCoopId').innerText = 'Co-op ID: ' + coop.id;
+    return;
+  }
+  if(localStorage.getItem('nd_login_'+activeCoopId)!==coopMap[activeCoopId]?.password) return alert('❌ Enter password first for '+activeCoopCode);
+  const farmer=document.getElementById('farmer').value.trim();
+  const vol=Number(document.getElementById('volume').value);
+  const fat=Number(document.getElementById('fat').value)||3.8;
+  const quality=document.getElementById('quality').value;
+  if(!farmer||!vol) return alert('Enter farmer and volume');
+  const batch=activeCoopCode+'-'+Math.floor(10000+Math.random()*89999);
+  const payload={batch_id:batch, farmer_name:farmer, volume:vol, litres:vol, fat_percent:fat, fat:fat, quality, cooperative_id:activeCoopId, coop_code:activeCoopCode};
+  const {error}=await supa.from('deliveries').insert([payload]).select();
+  if(error){ document.getElementById('msg').innerHTML='<span class="text-red-600">❌ '+error.message+'</span>'; }
+  else { document.getElementById('msg').innerHTML='<span class="text-green-700">✅ Saved '+batch+' to '+activeCoopCode+'</span>'; document.getElementById('farmer').value=''; document.getElementById('volume').value=''; await loadClerk(); }
+}
+
+async function loadClerk(){
+  if(!activeCoopId) return;
+  const coop = coopMap[activeCoopId];
+  if(coop && coop.is_active === false) return;
+  if(localStorage.getItem('nd_login_'+activeCoopId)!==coopMap[activeCoopId]?.password) return;
+  const {data, error}=await supa.from('deliveries').select('*').eq('cooperative_id', activeCoopId).order('created_at',{ascending:false}).limit(200);
+  if(error){ document.getElementById('clerkBody').innerHTML=`<tr><td colspan="4" class="p-6 text-red-600">Error: ${error.message}</td></tr>`; return; }
+  allDeliveries = data || [];
+  let total=0, acc=0, gb=0, rej=0;
+  allDeliveries.forEach(r=>{ const v=Number(r.volume||r.litres||0); total+=v; const q=(r.quality||'').toLowerCase(); if(q.includes('accepted')) acc+=v; else if(q.includes('grade b')) gb+=v; else if(q.includes('reject')) rej+=v; });
+  document.getElementById('cTotal').innerText=total+' L'; document.getElementById('cAcc').innerText=acc+' L'; document.getElementById('cB').innerText=gb+' L'; document.getElementById('cRej').innerText=rej+' L';
+  
+  document.getElementById('shiftBatches').innerText = allDeliveries.length;
+  document.getElementById('shiftVol').innerText = total + ' L';
+  document.getElementById('shiftPayout').innerText = 'KES ' + (total * 45).toLocaleString();
+  document.getElementById('shiftCoopName').innerText = coopMap[activeCoopId]?.name || activeCoopCode;
+
+  renderTable();
+}
+
+async function init(){
+  let cfg; try{ const r=await fetch('/api/config'); cfg=await r.json(); }catch{ cfg={url:"https://hkhqbtyyqgvaktamilxs.supabase.co", anonKey:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhraHFidHl5cWd2YWt0YW1pbHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMTQwNDQsImV4cCI6MjEwNjU5MDA0NH0.gJcUf9XgzF34sczhD79V9oOnPD7a3XEU-5BXoQHWuAg"}; }
+  supa=supabase.createClient(cfg.url,cfg.anonKey);
+  await loadCoops();
+}
+init();
 </script>
 </body>
 </html>
