@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>National Dairy - Cooperative Boss Portal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>body{font-family:DM Sans,sans-serif;background:#0d1512;color:#e2e8f0}</style>
+</head>
+<body class="pb-10">
+
+<header class="bg-[#14231c] border-b border-emerald-900/40 px-4 py-3.5 sticky top-0 z-50">
+  <div class="max-w-6xl mx-auto flex justify-between items-center">
+    <div class="flex items-center gap-2">
+      <span class="text-xl">👑</span>
+      <div>
+        <h1 class="font-bold text-sm text-emerald-400 leading-none">Coop Manager Portal</h1>
+        <span class="text-[10px] text-gray-400">National Dairy Executive View</span>
+      </div>
+    </div>
+    <div id="bossHeaderInfo" class="hidden text-right text-xs">
+      <div id="bossCoopTitle" class="font-bold text-white">--</div>
+      <button onclick="bossLogout()" class="text-[10px] text-red-400 underline">Logout</button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 mt-6">
+
+  <!-- BOSS LOGIN OVERLAY -->
+  <div id="bossLoginCard" class="bg-[#14231c] border border-emerald-800/50 rounded-2xl p-6 max-w-md mx-auto my-10 shadow-2xl">
+    <div class="text-center mb-6">
+      <div class="text-3xl mb-1">🏛️</div>
+      <h2 class="text-lg font-bold text-white">Cooperative Manager Login</h2>
+      <p class="text-xs text-gray-400">Select your cooperative and enter your manager password.</p>
+    </div>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-gray-300 mb-1">Select Cooperative</label>
+        <select id="bossCoopSelect" class="w-full bg-[#0d1512] border border-emerald-900 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-emerald-500">
+          <option value="">Loading cooperatives...</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-gray-300 mb-1">Coop Password</label>
+        <div class="relative">
+          <input id="bossPasswordInput" type="password" placeholder="Enter coop password" class="w-full bg-[#0d1512] border border-emerald-900 rounded-xl p-3 text-xs text-white pr-10 focus:outline-none focus:border-emerald-500">
+          <span onclick="togglePass()" class="absolute right-3 top-3 cursor-pointer text-sm">👁️</span>
+        </div>
+      </div>
+
+      <button onclick="loginBoss()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs transition-all shadow-lg">
+        Unlock Boss Dashboard
+      </button>
+      
+      <p id="bossLoginMsg" class="text-center text-xs font-bold text-red-400"></p>
+    </div>
+  </div>
+
+  <!-- DASHBOARD CONTENT (Hidden until logged in) -->
+  <div id="bossDashboard" class="hidden space-y-6">
+
+    <!-- METRICS GRID -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="bg-[#14231c] border border-emerald-900/50 p-4 rounded-2xl">
+        <span class="text-xs text-gray-400">Total Volume</span>
+        <b id="bTotalVol" class="text-2xl block font-black text-emerald-400 mt-1">0 L</b>
+      </div>
+      <div class="bg-[#14231c] border border-emerald-900/50 p-4 rounded-2xl">
+        <span class="text-xs text-gray-400">Est. Payout (45 KES/L)</span>
+        <b id="bEstPayout" class="text-2xl block font-black text-white mt-1">KES 0</b>
+      </div>
+      <div class="bg-[#14231c] border border-emerald-900/50 p-4 rounded-2xl">
+        <span class="text-xs text-gray-400">Active Farmers</span>
+        <b id="bActiveFarmers" class="text-2xl block font-black text-blue-400 mt-1">0</b>
+      </div>
+      <div class="bg-[#14231c] border border-emerald-900/50 p-4 rounded-2xl">
+        <span class="text-xs text-gray-400">Rejection Rate</span>
+        <b id="bRejRate" class="text-2xl block font-black text-red-400 mt-1">0%</b>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="flex gap-2 border-b border-emerald-900/40 pb-2">
+      <button id="tabBtn1" onclick="switchTab('deliveries')" class="px-4 py-2 text-xs font-bold rounded-xl bg-emerald-600 text-white">📋 Live Clerk Entries</button>
+      <button id="tabBtn2" onclick="switchTab('farmers')" class="px-4 py-2 text-xs font-bold rounded-xl bg-[#14231c] text-gray-400 hover:text-white">👨‍🌾 Farmer Payout Ledgers</button>
+    </div>
+
+    <!-- DELIVERIES SECTION -->
+    <div id="deliveriesTab" class="bg-[#14231c] border border-emerald-900/50 rounded-2xl p-4">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-bold text-sm text-white">Clerk Deliveries Log</h3>
+        <button onclick="fetchBossData()" class="text-xs bg-emerald-900/40 text-emerald-300 px-3 py-1.5 rounded-lg border border-emerald-700/50">🔄 Refresh</button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left">
+          <thead class="bg-[#0d1512] text-gray-400 border-b border-emerald-900/50">
+            <tr>
+              <th class="p-3">Batch ID</th>
+              <th class="p-3">Farmer</th>
+              <th class="p-3">Volume</th>
+              <th class="p-3">Quality</th>
+              <th class="p-3">Time</th>
+              <th class="p-3 text-right">Manager Action</th>
+            </tr>
+          </thead>
+          <tbody id="bossDeliveriesBody">
+            <tr><td colspan="6" class="p-6 text-center text-gray-500">Loading deliveries...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FARMERS SECTION -->
+    <div id="farmersTab" class="hidden bg-[#14231c] border border-emerald-900/50 rounded-2xl p-4">
+      <h3 class="font-bold text-sm text-white mb-4">Farmer Summary & Estimated Earnings</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left">
+          <thead class="bg-[#0d1512] text-gray-400 border-b border-emerald-900/50">
+            <tr>
+              <th class="p-3">Farmer Name</th>
+              <th class="p-3">Total Deliveries</th>
+              <th class="p-3">Total Volume</th>
+              <th class="p-3">Gross Payout (KES 45/L)</th>
+            </tr>
+          </thead>
+          <tbody id="bossFarmersBody">
+            <tr><td colspan="4" class="p-6 text-center text-gray-500">Loading farmer ledger...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+let supa, currentBossCoop = null, bossDeliveries = [];
+
+function togglePass() {
+  const inp = document.getElementById('bossPasswordInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+async function initBoss() {
+  let cfg; 
+  try { 
+    const r = await fetch('/api/config'); 
+    cfg = await r.json(); 
+  } catch { 
+    cfg = {
+      url: "https://hkhqbtyyqgvaktamilxs.supabase.co", 
+      anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhraHFidHl5cWd2YWt0YW1pbHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMTQwNDQsImV4cCI6MjEwNjU5MDA0NH0.gJcUf9XgzF34sczhD79V9oOnPD7a3XEU-5BXoQHWuAg"
+    }; 
+  }
+  supa = supabase.createClient(cfg.url, cfg.anonKey);
+  await populateCoopDropdown();
+}
+
+async function populateCoopDropdown() {
+  const { data } = await supa.from('cooperatives').select('*').order('name');
+  const sel = document.getElementById('bossCoopSelect');
+  if(!data || data.length === 0) {
+    sel.innerHTML = '<option value="">No cooperatives found</option>';
+    return;
+  }
+  sel.innerHTML = '<option value="">Select your cooperative...</option>' + 
+    data.map(c => `<option value="${c.id}">${c.name} (${c.code})</option>`).join('');
+}
+
+async function loginBoss() {
+  const coopId = document.getElementById('bossCoopSelect').value;
+  const pass = document.getElementById('bossPasswordInput').value.trim();
+  const msg = document.getElementById('bossLoginMsg');
+
+  if(!coopId || !pass) return msg.innerText = 'Select a coop and enter password!';
+
+  const { data: coop } = await supa.from('cooperatives').select('*').eq('id', coopId).single();
+
+  if(!coop) return msg.innerText = 'Cooperative not found!';
+  if(coop.is_active === false) return msg.innerText = '⛔ Cooperative is deactivated by Admin!';
+  if(coop.password !== pass) return msg.innerText = '❌ Incorrect password!';
+
+  currentBossCoop = coop;
+  msg.innerText = '';
+  document.getElementById('bossLoginCard').classList.add('hidden');
+  document.getElementById('bossDashboard').classList.remove('hidden');
+  document.getElementById('bossHeaderInfo').classList.remove('hidden');
+  document.getElementById('bossCoopTitle').innerText = coop.name;
+
+  fetchBossData();
+}
+
+function bossLogout() {
+  currentBossCoop = null;
+  document.getElementById('bossDashboard').classList.add('hidden');
+  document.getElementById('bossHeaderInfo').classList.add('hidden');
+  document.getElementById('bossLoginCard').classList.remove('hidden');
+}
+
+async function fetchBossData() {
+  if(!currentBossCoop) return;
+
+  const { data, error } = await supa.from('deliveries')
+    .select('*')
+    .eq('cooperative_id', currentBossCoop.id)
+    .order('created_at', { ascending: false });
+
+  if(error) return alert('Failed to fetch data: ' + error.message);
+
+  bossDeliveries = data || [];
+  renderBossMetrics();
+  renderBossDeliveries();
+  renderBossFarmers();
+}
+
+function renderBossMetrics() {
+  let totalVol = 0, rejections = 0;
+  const farmers = new Set();
+
+  bossDeliveries.forEach(d => {
+    const v = Number(d.volume || d.litres || 0);
+    totalVol += v;
+    if(d.farmer_name) farmers.add(d.farmer_name.trim().toLowerCase());
+    if((d.quality || '').toLowerCase().includes('reject')) rejections += v;
+  });
+
+  document.getElementById('bTotalVol').innerText = totalVol.toLocaleString() + ' L';
+  document.getElementById('bEstPayout').innerText = 'KES ' + (totalVol * 45).toLocaleString();
+  document.getElementById('bActiveFarmers').innerText = farmers.size;
+  document.getElementById('bRejRate').innerText = totalVol > 0 ? ((rejections / totalVol) * 100).toFixed(1) + '%' : '0%';
+}
+
+function renderBossDeliveries() {
+  const tbody = document.getElementById('bossDeliveriesBody');
+  if(bossDeliveries.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-500">No deliveries recorded yet.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = bossDeliveries.map(d => `
+    <tr class="border-b border-emerald-900/20 hover:bg-[#1a2d24]">
+      <td class="p-3 font-mono text-emerald-400">${d.batch_id}</td>
+      <td class="p-3 font-bold text-white">${d.farmer_name}</td>
+      <td class="p-3 font-bold">${d.volume || d.litres} L</td>
+      <td class="p-3">
+        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${ (d.quality||'').toLowerCase().includes('reject') ? 'bg-red-900/50 text-red-300 border border-red-700' : 'bg-emerald-900/50 text-emerald-300 border border-emerald-700' }">
+          ${d.quality}
+        </span>
+      </td>
+      <td class="p-3 text-gray-400 text-[10px]">${new Date(d.created_at || Date.now()).toLocaleTimeString()}</td>
+      <td class="p-3 text-right">
+        <button onclick="deleteDelivery('${d.id}')" class="bg-red-900/40 hover:bg-red-800 text-red-300 border border-red-700 px-2 py-1 rounded text-[10px]">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderBossFarmers() {
+  const farmerMap = {};
+  bossDeliveries.forEach(d => {
+    const name = d.farmer_name || 'Unknown';
+    const v = Number(d.volume || d.litres || 0);
+    if(!farmerMap[name]) farmerMap[name] = { count: 0, volume: 0 };
+    farmerMap[name].count += 1;
+    farmerMap[name].volume += v;
+  });
+
+  const tbody = document.getElementById('bossFarmersBody');
+  const farmerKeys = Object.keys(farmerMap);
+
+  if(farmerKeys.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-500">No farmer data available.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = farmerKeys.map(name => `
+    <tr class="border-b border-emerald-900/20 hover:bg-[#1a2d24]">
+      <td class="p-3 font-bold text-white">${name}</td>
+      <td class="p-3">${farmerMap[name].count} batches</td>
+      <td class="p-3 font-bold text-emerald-400">${farmerMap[name].volume} L</td>
+      <td class="p-3 font-bold text-white">KES ${(farmerMap[name].volume * 45).toLocaleString()}</td>
+    </tr>
+  `).join('');
+}
+
+async function deleteDelivery(id) {
+  if(!confirm('Are you sure you want to delete this delivery entry?')) return;
+  const { error } = await supa.from('deliveries').delete().eq('id', id);
+  if(error) alert('Error: ' + error.message);
+  else fetchBossData();
+}
+
+function switchTab(tab) {
+  if(tab === 'deliveries') {
+    document.getElementById('deliveriesTab').classList.remove('hidden');
+    document.getElementById('farmersTab').classList.add('hidden');
+    document.getElementById('tabBtn1').className = "px-4 py-2 text-xs font-bold rounded-xl bg-emerald-600 text-white";
+    document.getElementById('tabBtn2').className = "px-4 py-2 text-xs font-bold rounded-xl bg-[#14231c] text-gray-400 hover:text-white";
+  } else {
+    document.getElementById('deliveriesTab').classList.add('hidden');
+    document.getElementById('farmersTab').classList.remove('hidden');
+    document.getElementById('tabBtn2').className = "px-4 py-2 text-xs font-bold rounded-xl bg-emerald-600 text-white";
+    document.getElementById('tabBtn1').className = "px-4 py-2 text-xs font-bold rounded-xl bg-[#14231c] text-gray-400 hover:text-white";
+  }
+}
+
+initBoss();
+</script>
+</body>
+</html>
