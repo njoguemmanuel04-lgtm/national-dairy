@@ -2,6 +2,7 @@ const CACHE_NAME = 'national-dairy-v1';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
+  '/manifest.json',
   'https://cdn.tailwindcss.com',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js'
 ];
@@ -30,7 +31,6 @@ self.addEventListener('activate', (event) => {
 
 // Fetch Event - Serve Network First, Fallback to Cache Offline
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET or Supabase API calls from raw caching (handled via offline queue in JS)
   if (event.request.method !== 'GET' || event.request.url.includes('supabase.co')) return;
 
   event.respondWith(
