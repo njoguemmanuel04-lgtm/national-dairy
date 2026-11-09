@@ -18,8 +18,8 @@
 <style>body{font-family:DM Sans,sans-serif;background:#f5f8f5}</style>
 </head>
 <body>
-<div class="bg-[#0a4d2e] text-white text-center text-[11px] py-1.5 flex justify-between px-4 items-center">
-  <div>🇰🇪 NATIONAL DAIRY Live — Password Required • Isolated Milk Links</div>
+<div id="topStatusBar" class="bg-[#0a4d2e] text-white text-center text-[11px] py-1.5 flex justify-between px-4 items-center transition-all">
+  <div>🇰🇪 NATIONAL DAIRY Live — Isolated Milk Links</div>
   <div class="flex items-center gap-2">
     <span id="pendingCount" class="text-amber-300 font-bold text-[10px]"></span>
     <span id="netStatusBadge" class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">🟢 ONLINE</span>
@@ -185,12 +185,20 @@ window.addEventListener('offline', updateNetworkStatus);
 
 function updateNetworkStatus() {
   const isOnline = navigator.onLine;
+  const statusBar = document.getElementById('topStatusBar');
   const badge = document.getElementById('netStatusBadge');
-  if (badge) {
-    badge.innerText = isOnline ? '🟢 ONLINE' : '🔴 OFFLINE (Queuing)';
-    badge.className = isOnline 
-      ? 'bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded'
-      : 'bg-red-100 text-red-800 text-[10px] font-bold px-2 py-0.5 rounded animate-pulse';
+  const coopNameTag = activeCoopCode ? `• ${activeCoopCode}` : '';
+
+  if (statusBar && badge) {
+    if (isOnline) {
+      statusBar.className = "bg-[#0a4d2e] text-white text-center text-[11px] py-1.5 flex justify-between px-4 items-center";
+      badge.innerText = "🟢 ONLINE";
+      badge.className = "bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded";
+    } else {
+      statusBar.className = "bg-red-900 text-white text-center text-[11px] py-1.5 flex justify-between px-4 items-center animate-pulse";
+      badge.innerText = `🔴 Offline - Deliveries saved in phone ${coopNameTag}`;
+      badge.className = "bg-red-100 text-red-900 text-[10px] font-bold px-2 py-0.5 rounded";
+    }
   }
   if (isOnline) syncPendingDeliveries();
 }
@@ -292,6 +300,8 @@ function switchCoop(fromUrl=false){
   document.getElementById('cTotal').innerText='0 L'; document.getElementById('cAcc').innerText='0 L'; document.getElementById('cB').innerText='0 L'; document.getElementById('cRej').innerText='0 L';
   document.getElementById('msg').innerText='';
 
+  updateNetworkStatus();
+
   const coopNameEl = document.getElementById('loginCoopName');
   if(coopNameEl) coopNameEl.innerText = coop.name;
 
@@ -367,7 +377,7 @@ async function loadCoops(){
     }
   }
 
-  // STRICT ISOLATION: If loaded via direct link, lock dropdown to ONLY show that cooperative
+  // STRICT ISOLATION: If loaded via direct link, lock dropdown to ONLY show that cooperative and hide others
   if(urlFilter && targetCoop){
     sel.innerHTML = `<option value="${targetCoop.id}">${targetCoop.code} - ${targetCoop.name} (Locked Link)</option>`;
     sel.disabled = true;
