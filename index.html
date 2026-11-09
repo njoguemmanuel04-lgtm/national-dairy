@@ -8,7 +8,14 @@
 <style>body{font-family:DM Sans,sans-serif;background:#f5f8f5}</style>
 </head>
 <body>
-<div class="bg-[#0a4d2e] text-white text-center text-[11px] py-1.5">🇰🇪 NATIONAL DAIRY Live — Password Required • Isolated Milk Links</div>
+<div class="bg-[#0a4d2e] text-white text-center text-[11px] py-1.5 flex justify-between px-4 items-center">
+  <div>🇰🇪 NATIONAL DAIRY Live — Password Required • Isolated Milk Links</div>
+  <div class="flex items-center gap-2">
+    <span id="pendingCount" class="text-amber-300 font-bold text-[10px]"></span>
+    <span id="netStatusBadge" class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">🟢 ONLINE</span>
+  </div>
+</div>
+
 <header class="bg-white border-b flex justify-between items-center px-4 py-3">
   <div class="font-bold text-[14px]">🇰🇪 National Dairy Cooperative - Kenya</div>
   <div class="text-[12px] font-bold">
@@ -152,6 +159,31 @@
 <script>
 let supa, allDeliveries=[], activeCoopId=null, activeCoopCode=null, coopMap={};
 let selectedPlanName = 'Monthly', selectedPlanPrice = 1500;
+
+// Register Service Worker for PWA Offline Shell
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('✅ ServiceWorker registered:', reg.scope))
+      .catch(err => console.error('❌ ServiceWorker registration failed:', err));
+  });
+}
+
+// Network status listeners
+window.addEventListener('online', updateNetworkStatus);
+window.addEventListener('offline', updateNetworkStatus);
+
+function updateNetworkStatus() {
+  const isOnline = navigator.onLine;
+  const badge = document.getElementById('netStatusBadge');
+  if (badge) {
+    badge.innerText = isOnline ? '🟢 ONLINE' : '🔴 OFFLINE (Queuing)';
+    badge.className = isOnline 
+      ? 'bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded'
+      : 'bg-red-100 text-red-800 text-[10px] font-bold px-2 py-0.5 rounded animate-pulse';
+  }
+  if (isOnline) syncPendingDeliveries();
+}
 
 function toggleEye(i,e){ const inp=document.getElementById(i); const eye=document.getElementById(e); if(inp.type==='password'){inp.type='text';eye.innerText='🙈';}else{inp.type='password';eye.innerText='👁️';} }
 function showRegister(){ document.getElementById('registerBox').classList.remove('hidden'); }
@@ -356,6 +388,43 @@ function renderTable(){
   dList.innerHTML = uniqueFarmers.map(name => `<option value="${name}">`).join('');
 }
 
+function queueOfflineDelivery(payload) {
+  const queue = JSON.parse(localStorage.getItem('nd_pending_queue') || '[]');
+  queue.push(payload);
+  localStorage.setItem('nd_pending_queue', JSON.stringify(queue));
+  updatePendingCount();
+}
+
+async function syncPendingDeliveries() {
+  const queue = JSON.parse(localStorage.getItem('nd_pending_queue') || '[]');
+  if (queue.length === 0) return;
+
+  const msg = document.getElementById('msg');
+  if (msg) msg.innerHTML = `<span class="text-blue-600 font-bold">⚡ Syncing ${queue.length} offline deliveries...</span>`;
+
+  const remaining = [];
+  for (const item of queue) {
+    const { error } = await supa.from('deliveries').insert([item]);
+    if (error) remaining.push(item);
+  }
+
+  localStorage.setItem('nd_pending_queue', JSON.stringify(remaining));
+  updatePendingCount();
+
+  if (remaining.length === 0) {
+    if (msg) msg.innerHTML = `<span class="text-green-700 font-bold">✅ All offline deliveries synced to National Dairy Live!</span>`;
+    await loadClerk();
+  }
+}
+
+function updatePendingCount() {
+  const queue = JSON.parse(localStorage.getItem('nd_pending_queue') || '[]');
+  const countEl = document.getElementById('pendingCount');
+  if (countEl) {
+    countEl.innerText = queue.length > 0 ? `📦 ${queue.length} Pending Sync` : '';
+  }
+}
+
 async function saveDelivery(){
   if(!activeCoopId) return alert('Select Co-op first');
   const coop = coopMap[activeCoopId];
@@ -369,11 +438,31 @@ async function saveDelivery(){
   const fat=Number(document.getElementById('fat').value)||3.8;
   const quality=document.getElementById('quality').value;
   if(!farmer||!vol) return alert('Enter farmer and volume');
+  
   const batch=activeCoopCode+'-'+Math.floor(10000+Math.random()*89999);
   const payload={batch_id:batch, farmer_name:farmer, volume:vol, litres:vol, fat_percent:fat, fat:fat, quality, cooperative_id:activeCoopId, coop_code:activeCoopCode};
-  const {error}=await supa.from('deliveries').insert([payload]).select();
-  if(error){ document.getElementById('msg').innerHTML='<span class="text-red-600">❌ '+error.message+'</span>'; }
-  else { document.getElementById('msg').innerHTML='<span class="text-green-700">✅ Saved '+batch+' to '+activeCoopCode+'</span>'; document.getElementById('farmer').value=''; document.getElementById('volume').value=''; await loadClerk(); }
+  
+  if (!navigator.onLine) {
+    queueOfflineDelivery(payload);
+    document.getElementById('msg').innerHTML = `<span class="text-orange-600 font-bold">⚠️ Saved Offline! Will sync automatically when network restores.</span>`;
+    document.getElementById('farmer').value = '';
+    document.getElementById('volume').value = '';
+    return;
+  }
+
+  try {
+    const {error}=await supa.from('deliveries').insert([payload]).select();
+    if(error) throw error;
+    document.getElementById('msg').innerHTML='<span class="text-green-700">✅ Saved '+batch+' to '+activeCoopCode+'</span>';
+    document.getElementById('farmer').value='';
+    document.getElementById('volume').value='';
+    await loadClerk();
+  } catch (err) {
+    queueOfflineDelivery(payload);
+    document.getElementById('msg').innerHTML = `<span class="text-orange-600 font-bold">⚠️ Connection drop. Saved to offline queue.</span>`;
+    document.getElementById('farmer').value = '';
+    document.getElementById('volume').value = '';
+  }
 }
 
 async function loadClerk(){
@@ -402,6 +491,8 @@ async function loadClerk(){
 async function init(){
   let cfg; try{ const r=await fetch('/api/config'); cfg=await r.json(); }catch{ cfg={url:"https://hkhqbtyyqgvaktamilxs.supabase.co", anonKey:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhraHFidHl5cWd2YWt0YW1pbHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMTQwNDQsImV4cCI6MjEwNjU5MDA0NH0.gJcUf9XgzF34sczhD79V9oOnPD7a3XEU-5BXoQHWuAg"}; }
   supa=supabase.createClient(cfg.url,cfg.anonKey);
+  updateNetworkStatus();
+  updatePendingCount();
   await loadCoops();
 }
 init();
