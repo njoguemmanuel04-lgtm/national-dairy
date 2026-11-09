@@ -458,25 +458,56 @@ function updatePendingCount() {
 }
 
 async function saveDelivery(){
-  if(!activeCoopId) return alert('Select Co-op first');
+  if (!activeCoopId) {
+    const urlFilter = getCoopFilterFromUrl();
+    const savedId = localStorage.getItem('nd_coop_id');
+    if (urlFilter && coopMap) {
+      const match = Object.values(coopMap).find(c => c.code.toLowerCase() === urlFilter || c.id === urlFilter);
+      if (match) { activeCoopId = match.id; activeCoopCode = match.code; }
+    } else if (savedId && coopMap[savedId]) {
+      activeCoopId = savedId;
+      activeCoopCode = coopMap[savedId].code;
+    }
+  }
+
+  if(!activeCoopId) return alert('Please select your Cooperative first!');
+  
   const coop = coopMap[activeCoopId];
   if(coop && coop.is_active === false){
     showLockoutScreen(coop.id);
     return;
   }
-  if(localStorage.getItem('nd_login_'+activeCoopId)!==coopMap[activeCoopId]?.password) return alert('❌ Enter password first for '+activeCoopCode);
+
+  if(localStorage.getItem('nd_login_'+activeCoopId) !== coop?.password){
+    document.getElementById('coopPassword').focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return alert('🔒 Please enter the password for ' + activeCoopCode + ' in the box above to unlock and record deliveries.');
+  }
+
   const farmer=document.getElementById('farmer').value.trim();
   const vol=Number(document.getElementById('volume').value);
   const fat=Number(document.getElementById('fat').value)||3.8;
   const quality=document.getElementById('quality').value;
-  if(!farmer||!vol) return alert('Enter farmer and volume');
   
-  const batch=activeCoopCode+'-'+Math.floor(10000+Math.random()*89999);
-  const payload={batch_id:batch, farmer_name:farmer, volume:vol, litres:vol, fat_percent:fat, fat:fat, quality, cooperative_id:activeCoopId, coop_code:activeCoopCode};
+  if(!farmer||!vol) return alert('Enter farmer name and volume!');
+  
+  const codePrefix = activeCoopCode || 'MILK';
+  const batch=codePrefix+'-'+Math.floor(10000+Math.random()*89999);
+  const payload={
+    batch_id:batch, 
+    farmer_name:farmer, 
+    volume:vol, 
+    litres:vol, 
+    fat_percent:fat, 
+    fat:fat, 
+    quality, 
+    cooperative_id:activeCoopId, 
+    coop_code:codePrefix
+  };
   
   if (!navigator.onLine) {
     queueOfflineDelivery(payload);
-    document.getElementById('msg').innerHTML = `<span class="text-orange-600 font-bold">⚠️ Saved Offline! Will sync automatically when network restores.</span>`;
+    document.getElementById('msg').innerHTML = `<span class="text-orange-600 font-bold">⚠️ Saved Offline! Stored securely on phone. Will sync when online.</span>`;
     document.getElementById('farmer').value = '';
     document.getElementById('volume').value = '';
     return;
@@ -485,13 +516,13 @@ async function saveDelivery(){
   try {
     const {error}=await supa.from('deliveries').insert([payload]).select();
     if(error) throw error;
-    document.getElementById('msg').innerHTML='<span class="text-green-700">✅ Saved '+batch+' to '+activeCoopCode+'</span>';
+    document.getElementById('msg').innerHTML='<span class="text-green-700 font-bold">✅ Saved '+batch+' to '+codePrefix+'</span>';
     document.getElementById('farmer').value='';
     document.getElementById('volume').value='';
     await loadClerk();
   } catch (err) {
     queueOfflineDelivery(payload);
-    document.getElementById('msg').innerHTML = `<span class="text-orange-600 font-bold">⚠️ Connection drop. Saved to offline queue.</span>`;
+    document.getElementById('msg').innerHTML = `<span class="text-orange-600 font-bold">⚠️ Connection dropped. Saved to offline queue!</span>`;
     document.getElementById('farmer').value = '';
     document.getElementById('volume').value = '';
   }
