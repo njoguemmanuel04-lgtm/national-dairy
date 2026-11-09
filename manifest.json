@@ -1,0 +1,22 @@
+{
+  "name": "National Dairy Empire",
+  "short_name": "National Dairy",
+  "description": "Rural Field Clerk & Cooperative Dairy Logging Platform",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#f5f8f5",
+  "theme_color": "#0a4d2e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3050/3050158.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3050/3050158.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
