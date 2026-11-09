@@ -317,7 +317,7 @@ function switchCoop(fromUrl=false){
     document.getElementById('loginBtn').innerText='Unlock';
     document.getElementById('loginMsg').innerText='Password required to view milk for '+coop.code;
     body.innerHTML=`<tr><td colspan="4" class="p-8 text-center text-gray-500">🔒 Enter password to view <b>${coop.code}</b> milk<br>Isolated — other co-ops milk hidden</td></tr>`;
-    overlay.classList.remove('hidden');
+    overlay.classList.add('hidden');
   }
 }
 
@@ -354,10 +354,9 @@ async function loadCoops(){
   if(!data) return; coopMap={}; data.forEach(c=> coopMap[c.id]=c);
   
   const sel=document.getElementById('coopSelect');
-  sel.innerHTML='<option value="">Select Cooperative...</option>' + data.map(c=>`<option value="${c.id}">${c.code} - ${c.name} ${c.is_active===false?'🔒 (INACTIVE)':''} ${!c.password?'🆕 NO PASS':''}</option>`).join('');
-  
   const urlFilter = getCoopFilterFromUrl();
   let targetCoop = null;
+
   if(urlFilter){
     targetCoop = data.find(c => (c.code.toLowerCase() === urlFilter || c.id.toLowerCase() === urlFilter));
   }
@@ -368,13 +367,26 @@ async function loadCoops(){
     }
   }
 
-  if(targetCoop){
+  // STRICT ISOLATION: If loaded via direct link, lock dropdown to ONLY show that cooperative
+  if(urlFilter && targetCoop){
+    sel.innerHTML = `<option value="${targetCoop.id}">${targetCoop.code} - ${targetCoop.name} (Locked Link)</option>`;
+    sel.disabled = true;
     sel.value = targetCoop.id;
     if(targetCoop.is_active === false){
       showLockoutScreen(targetCoop.id);
       return;
     }
     switchCoop(true);
+  } else {
+    sel.innerHTML='<option value="">Select Cooperative...</option>' + data.map(c=>`<option value="${c.id}">${c.code} - ${c.name} ${c.is_active===false?'🔒 (INACTIVE)':''} ${!c.password?'🆕 NO PASS':''}</option>`).join('');
+    if(targetCoop){
+      sel.value = targetCoop.id;
+      if(targetCoop.is_active === false){
+        showLockoutScreen(targetCoop.id);
+        return;
+      }
+      switchCoop(true);
+    }
   }
 }
 
