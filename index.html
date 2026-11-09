@@ -111,7 +111,7 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
         <input id="regName" placeholder="Coop Name" class="border rounded-xl p-2.5 text-[12px]">
         <input id="regCode" placeholder="Code e.g. GITHUNGURI" class="border rounded-xl p-2.5 text-[12px] uppercase font-bold">
-        <div class="relative"><input id="regPass" type="password" placeholder="Create Password NOW" class="border-2 border-[#0a7a42] rounded-xl p-2.5 text-[12px] w-full pr-10"><span onclick="toggleEye('regPass','eye1')" id="eye1" class="absolute right-3 top-2.5 cursor-pointer text-[16px]">👁️</span></div>
+        <div class="relative"><input id="regPass" type="password" placeholder="Create Password NOW" class="border-2 border-[#0a4d2e] rounded-xl p-2.5 text-[12px] w-full pr-10"><span onclick="toggleEye('regPass','eye1')" id="eye1" class="absolute right-3 top-2.5 cursor-pointer text-[16px]">👁️</span></div>
       </div>
       <div class="flex gap-2 mt-2"><button onclick="registerCoop()" class="bg-[#0a7a42] text-white rounded-xl px-6 py-2.5 text-[12px] font-bold">Create Co-op</button><button onclick="hideRegister()" class="border rounded-xl px-6 py-2.5 text-[12px]">Cancel</button></div>
       <p id="regMsg" class="text-[11px] mt-2"></p>
@@ -208,7 +208,7 @@ function showRegister(){ document.getElementById('registerBox').classList.remove
 function hideRegister(){ document.getElementById('registerBox').classList.add('hidden'); }
 function showShiftSummary(){ document.getElementById('shiftModal').classList.remove('hidden'); }
 function hideShiftSummary(){ document.getElementById('shiftModal').classList.add('hidden'); }
-function logoutCoop(){ if(activeCoopId) localStorage.removeItem('nd_login_'+activeCoopId); localStorage.removeItem('nd_coop_id'); history.replaceState(null,'','?'); location.reload(); }
+function logoutCoop(){ if(activeCoopId) localStorage.removeItem('nd_login_'+activeCoopId); localStorage.removeItem('nd_coop_id'); localStorage.removeItem('nd_active_coop_object'); history.replaceState(null,'','?'); location.reload(); }
 
 function selectSubPlan(name, price){
   selectedPlanName = name;
@@ -300,6 +300,10 @@ function switchCoop(fromUrl=false){
   document.getElementById('cTotal').innerText='0 L'; document.getElementById('cAcc').innerText='0 L'; document.getElementById('cB').innerText='0 L'; document.getElementById('cRej').innerText='0 L';
   document.getElementById('msg').innerText='';
 
+  // Save active cooperative object for robust offline persistence
+  localStorage.setItem('nd_active_coop_object', JSON.stringify(coop));
+  localStorage.setItem('nd_coop_id', coop.id);
+
   updateNetworkStatus();
 
   const coopNameEl = document.getElementById('loginCoopName');
@@ -321,7 +325,6 @@ function switchCoop(fromUrl=false){
   if(savedPass === coop.password){
     overlay.classList.add('hidden');
     body.innerHTML=`<tr><td colspan="4" class="p-8 text-center">Loading ${coop.code} milk...</td></tr>`;
-    localStorage.setItem('nd_coop_id', activeCoopId);
     loadClerk();
   } else {
     document.getElementById('loginTitle').innerText='🔒 Enter Password for '+coop.name;
@@ -348,12 +351,16 @@ async function loginCoop(){
     const {error}=await supa.from('cooperatives').update({password:entered}).eq('id', activeCoopId);
     if(error) return msg.innerText=error.message;
     coop.password=entered; coopMap[activeCoopId]=coop;
-    localStorage.setItem('nd_login_'+activeCoopId, entered); localStorage.setItem('nd_coop_id', activeCoopId);
+    localStorage.setItem('nd_login_'+activeCoopId, entered); 
+    localStorage.setItem('nd_coop_id', activeCoopId);
+    localStorage.setItem('nd_active_coop_object', JSON.stringify(coop));
     document.getElementById('loginOverlay').classList.add('hidden');
     msg.innerText=''; loadClerk();
   } else {
     if(entered===coop.password){
-      localStorage.setItem('nd_login_'+activeCoopId, entered); localStorage.setItem('nd_coop_id', activeCoopId);
+      localStorage.setItem('nd_login_'+activeCoopId, entered); 
+      localStorage.setItem('nd_coop_id', activeCoopId);
+      localStorage.setItem('nd_active_coop_object', JSON.stringify(coop));
       document.getElementById('loginOverlay').classList.add('hidden'); msg.innerText=''; loadClerk();
     } else {
       msg.innerText='❌ Wrong password for '+coop.code+'! Try again. Eye icon 👁️ to see';
@@ -365,20 +372,25 @@ async function loadCoops(){
   let data = null;
   try {
     const res = await supa.from('cooperatives').select('*').order('name');
-    data = res.data;
-    if (data && data.length > 0) {
+    if (res.data && res.data.length > 0) {
+      data = res.data;
       localStorage.setItem('nd_cached_coops', JSON.stringify(data));
     }
-  } catch (err) {
-    // offline or network error
-  }
+  } catch (err) {}
 
-  // Fallback to local storage cache if offline
+  // Fallback to cached coops if offline
   if (!data || data.length === 0) {
     const cached = localStorage.getItem('nd_cached_coops');
     if (cached) {
       try { data = JSON.parse(cached); } catch(e){}
     }
+  }
+
+  // Absolute offline fallback: load active cooperative object backup
+  if ((!data || data.length === 0) && localStorage.getItem('nd_active_coop_object')) {
+    try {
+      data = [JSON.parse(localStorage.getItem('nd_active_coop_object'))];
+    } catch(e){}
   }
 
   if(!data) return; 
