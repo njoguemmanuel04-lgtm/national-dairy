@@ -313,6 +313,7 @@ function switchCoop(fromUrl=false){
     document.getElementById('loginMsg').innerText='This co-op has NO password yet. Create one now!';
     body.innerHTML=`<tr><td colspan="4" class="p-8 text-center text-orange-600 font-bold">🆕 ${coop.code} has no password — Create password first</td></tr>`;
     overlay.classList.remove('hidden');
+    overlay.scrollIntoView({ behavior: 'smooth' });
     return;
   }
 
@@ -327,7 +328,8 @@ function switchCoop(fromUrl=false){
     document.getElementById('loginBtn').innerText='Unlock';
     document.getElementById('loginMsg').innerText='Password required to view milk for '+coop.code;
     body.innerHTML=`<tr><td colspan="4" class="p-8 text-center text-gray-500">🔒 Enter password to view <b>${coop.code}</b> milk<br>Isolated — other co-ops milk hidden</td></tr>`;
-    overlay.classList.add('hidden');
+    overlay.classList.remove('hidden');
+    overlay.scrollIntoView({ behavior: 'smooth' });
   }
 }
 
@@ -377,7 +379,7 @@ async function loadCoops(){
     }
   }
 
-  // STRICT ISOLATION: If loaded via direct link, lock dropdown to ONLY show that cooperative and hide others
+  // STRICT ISOLATION: Lock dropdown when accessed via direct link
   if(urlFilter && targetCoop){
     sel.innerHTML = `<option value="${targetCoop.id}">${targetCoop.code} - ${targetCoop.name} (Locked Link)</option>`;
     sel.disabled = true;
@@ -479,9 +481,11 @@ async function saveDelivery(){
   }
 
   if(localStorage.getItem('nd_login_'+activeCoopId) !== coop?.password){
+    const overlay = document.getElementById('loginOverlay');
+    overlay.classList.remove('hidden');
+    overlay.scrollIntoView({ behavior: 'smooth' });
     document.getElementById('coopPassword').focus();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    return alert('🔒 Please enter the password for ' + activeCoopCode + ' in the box above to unlock and record deliveries.');
+    return alert('🔒 Please enter password for ' + activeCoopCode + ' in the yellow box above to unlock.');
   }
 
   const farmer=document.getElementById('farmer').value.trim();
