@@ -362,8 +362,28 @@ async function loginCoop(){
 }
 
 async function loadCoops(){
-  const {data}=await supa.from('cooperatives').select('*').order('name');
-  if(!data) return; coopMap={}; data.forEach(c=> coopMap[c.id]=c);
+  let data = null;
+  try {
+    const res = await supa.from('cooperatives').select('*').order('name');
+    data = res.data;
+    if (data && data.length > 0) {
+      localStorage.setItem('nd_cached_coops', JSON.stringify(data));
+    }
+  } catch (err) {
+    // offline or network error
+  }
+
+  // Fallback to local storage cache if offline
+  if (!data || data.length === 0) {
+    const cached = localStorage.getItem('nd_cached_coops');
+    if (cached) {
+      try { data = JSON.parse(cached); } catch(e){}
+    }
+  }
+
+  if(!data) return; 
+  coopMap={}; 
+  data.forEach(c=> coopMap[c.id]=c);
   
   const sel=document.getElementById('coopSelect');
   const urlFilter = getCoopFilterFromUrl();
