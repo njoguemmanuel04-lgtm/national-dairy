@@ -242,6 +242,21 @@ function shareOnWhatsApp(name, code, pass, coopId) {
   window.open(url, '_blank');
 }
 
+async function deleteCoop(coopId, coopName) {
+  if(!confirm(`⚠️ Are you sure you want to completely delete "${coopName}"? This will remove the cooperative and its records.`)) return;
+  
+  // Optional: delete associated deliveries first if foreign key cascade isn't set
+  await supa.from('deliveries').delete().eq('cooperative_id', coopId);
+  
+  const { error } = await supa.from('cooperatives').delete().eq('id', coopId);
+  if(error) {
+    alert('❌ Error deleting cooperative: ' + error.message);
+  } else {
+    alert('✅ Cooperative deleted successfully.');
+    await loadAdminData();
+  }
+}
+
 function renderCoopList() {
   const container = document.getElementById('coopsList');
   if(allCoops.length === 0) {
@@ -279,8 +294,12 @@ function renderCoopList() {
           <option value="Lifetime" ${c.plan_type === 'Lifetime' ? 'selected' : ''}>Lifetime (35k)</option>
         </select>
 
-        <button onclick="toggleActive('${c.id}', ${c.is_active !== false})" class="text-[10px] font-bold px-3 py-1.5 rounded-lg border ${c.is_active === false ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}">
+        <button onclick="toggleActive('${c.id}', ${c.is_active !== false})" class="text-[10px] font-bold px-3 py-1.5 rounded-lg border ${c.is_active === false ? 'bg-emerald-600 text-white' : 'bg-orange-600 text-white'}">
           ${c.is_active === false ? 'Activate' : 'Block'}
+        </button>
+
+        <button onclick="deleteCoop('${c.id}', '${c.name}')" class="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white">
+          🗑️ Delete
         </button>
       </div>
     </div>
@@ -305,8 +324,8 @@ function populatePayoutSelect() {
 }
 
 function calculatePayouts() {
-  const coopId = document.getElementById('payoutCoopSelect').value;
-  const rate = Number(document.getElementById('payoutRate').value) || 45;
+  const coopId = document.getElementById('payoutCoopSelect'].value;
+  const rate = Number(document.getElementById('payoutRate'].value) || 45;
 
   const filtered = coopId ? allDeliveries.filter(d => d.cooperative_id === coopId) : allDeliveries;
   let totalVol = 0;
